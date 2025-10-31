@@ -1,32 +1,44 @@
-# Ambiente virtual
+# ==========================
+# 🐍 Ambiente Python
+# ==========================
 venv/
-
-# VSCode / IDE
-.vscode/
-.idea/
-
-# Arquivos de ambiente
-.env
-**/.env
-
-# Cache do Python
 __pycache__/
 *.py[cod]
 *.egg-info/
 
-# Banco de dados local (dev)
-db.sqlite3
+# ==========================
+# 💻 IDE / Ferramentas locais
+# ==========================
+.vscode/
+.idea/
 
-# Arquivos gerados/temporários
+# ==========================
+# 🔐 Arquivos de ambiente e configs sensíveis
+# ==========================
+.env
+**/.env
+
+# ==========================
+# 🗃️ Banco de dados e uploads (INCLUÍDOS no Git para deploy)
+# ==========================
+# ⚠️ Permitido versionar o banco e uploads para facilitar o deploy em VMs
+# ⚠️ Se for migrar para produção real, volte a ignorar esses arquivos.
+!db.sqlite3
+!uploads/
+!uploads/**
+
+# ==========================
+# 📦 Arquivos temporários / sistema
+# ==========================
 .DS_Store
 Thumbs.db
 
-# Uploads do sistema (conteúdo dinâmico)
-uploads/
-!uploads/.gitkeep
-
-# Django collectstatic (se configurado)
+# ==========================
+# 🧱 Arquivos estáticos coletados (gerados por collectstatic)
+# ==========================
 staticfiles/
 
-# Logs
+# ==========================
+# 🧾 Logs
+# ==========================
 *.log
