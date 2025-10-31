@@ -1,0 +1,41 @@
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="container mt-5">
+
+  <div class="card shadow-sm border border-danger">
+    <div class="card-body">
+      <h4 class="mb-4 text-danger d-flex align-items-center">
+        🗑️ <span class="ms-2">Confirmar Exclusão do Usuário</span>
+      </h4>
+
+      <p class="fs-5">
+        Tem certeza que deseja excluir o usuário 
+        <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>?
+      </p>
+
+      {% include 'documentos/includes/confirm_delete_card.html' with doc=None action_url=delete_action_url cancel_url=cancel_url %}
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const form = document.querySelector('.delete-form');
+      if (!form) return;
+      let submitting = false;
+      form.addEventListener('submit', function(e){
+        if (submitting) {
+          e.preventDefault();
+          return;
+        }
+        submitting = true;
+        const btn = form.querySelector('button[type=submit]');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Excluindo...';
+        }
+      });
+    })();
+  </script>
+
+</div>
+{% endblock %}

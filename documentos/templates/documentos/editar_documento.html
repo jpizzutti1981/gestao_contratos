@@ -1,0 +1,770 @@
+{% extends 'base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .edit-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  .edit-container {
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .edit-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+  }
+
+  .card-header-modern {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 2rem;
+    border: none;
+  }
+
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .header-subtitle {
+    margin-top: 0.5rem;
+    opacity: 0.9;
+    font-size: 0.95rem;
+  }
+
+  .card-body-modern {
+    padding: 2.5rem;
+  }
+
+  /* Error Alert */
+  .error-alert {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-left: 4px solid #f59e0b;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .error-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .error-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .error-list li {
+    color: #92400e;
+    padding: 0.5rem 0;
+    font-weight: 600;
+  }
+
+  /* Form Groups */
+  .form-group-modern {
+    margin-bottom: 2rem;
+  }
+
+  .form-label-modern {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .form-control-modern {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+  }
+
+  .form-control-modern:focus {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .form-control-modern:disabled {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    color: #64748b;
+    cursor: not-allowed;
+    font-weight: 600;
+  }
+
+  textarea.form-control-modern {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .form-text-modern {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Attachments Section */
+  .attachments-section {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .attachment-item:hover {
+    border-color: #667eea;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+
+  .attachment-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .attachment-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+  }
+
+  .attachment-link:hover {
+    color: #764ba2;
+  }
+
+  .attachment-date {
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .btn-delete-attachment {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+  }
+
+  .btn-delete-attachment:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(250, 112, 154, 0.4);
+  }
+
+  .no-attachments {
+    text-align: center;
+    color: #64748b;
+    font-style: italic;
+    padding: 2rem;
+  }
+
+  /* File Input */
+  .file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+  }
+
+  .file-input-custom {
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: white;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .file-input-custom:hover {
+    border-color: #667eea;
+    background: #f8fafc;
+  }
+
+  .file-input-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .file-input-text {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+
+  input[type="file"] {
+    width: 100%;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+    margin-top: 2rem;
+  }
+
+  .btn-modern {
+    flex: 1;
+    border: none;
+    border-radius: 14px;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-save {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .btn-save:hover {
+    background: linear-gradient(135deg, #3cba92, #0ba360);
+    color: white;
+  }
+
+  .btn-cancel {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  .btn-cancel:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: white;
+  }
+
+  /* Modal Styling */
+  .modal-content {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal-header {
+    background: var(--danger-gradient);
+    color: white;
+    border-radius: 24px 24px 0 0;
+    padding: 1.5rem;
+    border: none;
+  }
+
+  .modal-title {
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .modal-body {
+    padding: 2rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  .attachment-name-highlight {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    color: #667eea;
+    display: inline-block;
+    margin: 0.5rem 0;
+  }
+
+  .modal-warning {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #92400e;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .modal-footer {
+    border: none;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .btn-close {
+    filter: brightness(0) invert(1);
+  }
+
+  /* Toast Notification */
+  .toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 350px;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    border: none;
+    animation: slideInRight 0.4s ease-out;
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(100px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .toast-success {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .toast-error {
+    background: var(--danger-gradient);
+    color: white;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .edit-wrapper {
+      padding: 1rem 0;
+    }
+
+    .edit-container {
+      padding: 0 1rem;
+    }
+
+    .card-header-modern {
+      padding: 1.5rem;
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+    }
+
+    .card-body-modern {
+      padding: 1.5rem;
+    }
+
+    .action-buttons {
+      flex-direction: column-reverse;
+    }
+
+    .attachment-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .btn-delete-attachment {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="edit-wrapper">
+  <div class="edit-container">
+    <div class="edit-card">
+      
+      <!-- Header -->
+      <div class="card-header-modern">
+        <h1 class="header-title">
+          <span>✏️</span>
+          <span>Editar {{ tipo_objeto|title }}</span>
+        </h1>
+        <p class="header-subtitle">Atualize as informações do documento</p>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body-modern">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% if request.GET.next or request.META.HTTP_REFERER %}
+            <input type="hidden" name="next" value="{{ request.GET.next|default:request.META.HTTP_REFERER }}">
+          {% endif %}
+
+          <!-- Error Alert -->
+          {% if form.errors %}
+            <div class="error-alert">
+              <div class="error-title">
+                <span>⚠️</span>
+                <span>Corrija os erros abaixo:</span>
+              </div>
+              <ul class="error-list">
+                {% for field in form %}
+                  {% for error in field.errors %}
+                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <!-- Type (Disabled) -->
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <span>📁</span>
+              <span>Tipo</span>
+            </label>
+            <input type="text" class="form-control form-control-modern" value="{{ tipo_objeto|title }}" disabled>
+          </div>
+
+          <!-- Title -->
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <span>📝</span>
+              <span>Título</span>
+            </label>
+            {{ form.titulo|add_class:"form-control form-control-modern" }}
+          </div>
+
+          <!-- Description -->
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <span>📄</span>
+              <span>Descrição</span>
+            </label>
+            {{ form.descricao|add_class:"form-control form-control-modern" }}
+          </div>
+
+          <!-- Dates Row -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <span>📤</span>
+                  <span>Data de Emissão</span>
+                </label>
+                {{ form.data_emissao|add_class:"form-control form-control-modern" }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <span>⏰</span>
+                  <span>Data de Vencimento</span>
+                </label>
+                {{ form.data_vencimento|add_class:"form-control form-control-modern" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Attachments -->
+          <div class="attachments-section">
+            <div class="section-header">
+              <span>📎</span>
+              <span>Anexos Atuais</span>
+            </div>
+            
+            {% if doc.anexos.all %}
+              <div id="anexos-atuais">
+                {% for anexo in doc.anexos.all %}
+                  <div class="attachment-item" id="anexo-{{ anexo.id }}">
+                    <div class="attachment-info">
+                      <a href="{{ anexo.arquivo.url }}" target="_blank" class="attachment-link">
+                        <span>📄</span>
+                        <span>{{ anexo.arquivo.name|basename }}</span>
+                      </a>
+                      <span class="attachment-date">{{ anexo.data_upload|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <button type="button" class="btn-delete-attachment btn-excluir-anexo"
+                            data-anexo-id="{{ anexo.id }}"
+                            data-anexo-name="{{ anexo.arquivo.name|escapejs }}">
+                      <span>🗑️</span>
+                      <span>Excluir</span>
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="no-attachments" id="anexos-atuais">
+                <p>📭 Nenhum anexo encontrado</p>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Add New Attachments -->
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <span>➕</span>
+              <span>Adicionar Novos Anexos</span>
+            </label>
+            <div class="file-input-wrapper">
+              <div class="file-input-custom">
+                <div class="file-input-icon">📁</div>
+                <div class="file-input-text">Clique para selecionar arquivos</div>
+                <input type="file" name="anexos" class="form-control form-control-modern" multiple 
+                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+              </div>
+            </div>
+            <div class="form-text-modern">
+              <span>💡</span>
+              <span>Você pode selecionar múltiplos arquivos. Formatos: PDF, DOC, DOCX, JPG, PNG</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            {% if request.GET.next or request.META.HTTP_REFERER %}
+              <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn-modern btn-cancel">
+                <span>↩️</span>
+                <span>Cancelar</span>
+              </a>
+            {% else %}
+              <a href="{% url 'detalhar_documento' tipo=tipo_objeto doc_id=doc.id %}" class="btn-modern btn-cancel">
+                <span>↩️</span>
+                <span>Cancelar</span>
+              </a>
+            {% endif %}
+            <button type="submit" class="btn-modern btn-save">
+              <span>💾</span>
+              <span>Salvar Alterações</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Attachment Modal -->
+<div class="modal fade" id="modalExcluirAnexo" tabindex="-1" aria-labelledby="modalExcluirAnexoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <span>🗑️</span>
+          <span>Excluir Anexo</span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Tem certeza que deseja excluir o anexo:</p>
+        <div class="attachment-name-highlight" id="nomeAnexoExcluir"></div>
+        <div class="modal-warning">
+          <span>⚠️</span>
+          <span>Esta ação não pode ser desfeita!</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn-modern btn-delete-attachment" id="btnConfirmarExclusao">
+          <span>🗑️</span>
+          <span>Confirmar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let anexoIdParaExcluir = null;
+
+function mostrarMensagem(mensagem, tipo = 'info') {
+  const mensagensAntigas = document.querySelectorAll('.toast-notification');
+  mensagensAntigas.forEach(msg => msg.remove());
+  
+  const alerta = document.createElement('div');
+  alerta.className = `alert alert-dismissible fade show toast-notification ${tipo === 'success' ? 'toast-success' : 'toast-error'}`;
+  
+  alerta.innerHTML = `
+    <div style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+      <div style="font-size: 1.5rem;">${tipo === 'success' ? '✅' : '❌'}</div>
+      <div style="flex: 1; font-weight: 600;">${mensagem}</div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" style="filter: brightness(0) invert(1);"></button>
+    </div>
+  `;
+  
+  document.body.appendChild(alerta);
+  
+  setTimeout(() => {
+    if (alerta.parentNode) {
+      alerta.remove();
+    }
+  }, 5000);
+}
+
+function excluirAnexo(anexoId, nomeArquivo) {
+  anexoIdParaExcluir = anexoId;
+  document.getElementById('nomeAnexoExcluir').textContent = nomeArquivo;
+  
+  const modal = new bootstrap.Modal(document.getElementById('modalExcluirAnexo'));
+  modal.show();
+}
+
+document.getElementById('btnConfirmarExclusao').addEventListener('click', function() {
+  if (anexoIdParaExcluir) {
+    fetch(`/documento/anexo/excluir/${anexoIdParaExcluir}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const anexoElement = document.getElementById(`anexo-${anexoIdParaExcluir}`);
+        anexoElement.style.opacity = '0';
+        anexoElement.style.transform = 'translateX(-20px)';
+        
+        setTimeout(() => {
+          anexoElement.remove();
+          
+          const anexosContainer = document.getElementById('anexos-atuais');
+          if (anexosContainer && anexosContainer.children.length === 0) {
+            anexosContainer.innerHTML = '<div class="no-attachments"><p>📭 Nenhum anexo encontrado</p></div>';
+          }
+        }, 300);
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalExcluirAnexo'));
+        modal.hide();
+        
+        mostrarMensagem('Anexo excluído com sucesso!', 'success');
+      } else {
+        mostrarMensagem('Erro ao excluir anexo: ' + (data.error || 'Erro desconhecido'), 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      mostrarMensagem('Erro ao excluir anexo. Tente novamente.', 'error');
+    });
+  }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const botoes = document.querySelectorAll('.btn-excluir-anexo');
+  botoes.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const anexoId = this.getAttribute('data-anexo-id');
+      const anexoName = this.getAttribute('data-anexo-name');
+      excluirAnexo(anexoId, anexoName);
+    });
+  });
+
+  // File input visual feedback
+  const fileInput = document.querySelector('input[type="file"]');
+  if (fileInput) {
+    fileInput.addEventListener('change', function(e) {
+      const fileCount = e.target.files.length;
+      const wrapper = fileInput.closest('.file-input-custom');
+      if (fileCount > 0) {
+        wrapper.querySelector('.file-input-text').textContent = 
+          `${fileCount} arquivo${fileCount > 1 ? 's' : ''} selecionado${fileCount > 1 ? 's' : ''}`;
+        wrapper.style.borderColor = '#0ba360';
+        wrapper.style.background = '#0ba36010';
+      }
+    });
+  }
+});
+</script>
+
+{% endblock %}

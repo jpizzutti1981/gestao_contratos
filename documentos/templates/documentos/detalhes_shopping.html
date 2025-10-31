@@ -1,0 +1,567 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  }
+
+  .shopping-details-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  /* Header Section */
+  .page-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--primary-gradient);
+  }
+
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .btn-add-document {
+    background: var(--success-gradient);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 0.85rem 1.75rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(11, 163, 96, 0.3);
+    text-decoration: none;
+  }
+
+  .btn-add-document:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(11, 163, 96, 0.4);
+    color: white;
+  }
+
+  /* Filter Section */
+  .filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  .filter-label {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .filter-btn {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: #64748b;
+    text-decoration: none;
+  }
+
+  .filter-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  }
+
+  .filter-btn.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Table Section */
+  .table-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table-modern thead {
+    background: var(--primary-gradient);
+    color: white;
+  }
+
+  .table-modern thead th {
+    padding: 1.25rem 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    border: none;
+  }
+
+  .table-modern thead th:first-child {
+    border-radius: 12px 0 0 0;
+  }
+
+  .table-modern thead th:last-child {
+    border-radius: 0 12px 0 0;
+  }
+
+  .table-modern tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .table-modern tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    transform: scale(1.01);
+  }
+
+  .table-modern tbody td {
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+    font-size: 0.95rem;
+    color: #334155;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+  }
+
+  .badge-vencido {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+  }
+
+  .badge-a-vencer {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+  }
+
+  .badge-em-dia {
+    background: linear-gradient(135deg, #0ba360, #3cba92);
+    color: white;
+  }
+
+  .badge-aprovado {
+    background: linear-gradient(135deg, #0ba360, #3cba92);
+    color: white;
+  }
+
+  .badge-reprovado {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+  }
+
+  .badge-pendente {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  /* Action Button */
+  .btn-detail {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.25rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .btn-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    color: white;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #64748b;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .pagination-modern {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page-item-modern {
+    margin: 0;
+  }
+
+  .page-link-modern {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    height: 45px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    color: #64748b;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .page-link-modern:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  }
+
+  .page-item-modern.active .page-link-modern {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .page-item-modern.disabled .page-link-modern {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .shopping-details-wrapper {
+      padding: 1rem 0;
+    }
+
+    .page-header {
+      padding: 1.5rem;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+    }
+
+    .btn-add-document {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .filter-section {
+      padding: 1rem;
+    }
+
+    .filter-buttons {
+      flex-direction: column;
+    }
+
+    .filter-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .table-container {
+      padding: 1rem;
+      overflow-x: auto;
+    }
+
+    .table-modern {
+      min-width: 800px;
+    }
+
+    .table-modern thead th,
+    .table-modern tbody td {
+      padding: 0.85rem 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .page-link-modern {
+      min-width: 40px;
+      height: 40px;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .header-title {
+      font-size: 1.2rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<div class="shopping-details-wrapper">
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="header-title">
+        <span>🏢</span>
+        <span>{{ shopping.nome }}</span>
+      </h1>
+      <a href="{% url 'novo_documento_shopping' shopping.id %}" 
+         class="btn-add-document"
+         aria-label="Inserir documento para {{ shopping.nome }}">
+        <span>➕</span>
+        <span>Inserir Documento</span>
+      </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section">
+      <div class="filter-label">
+        <span>🔍</span>
+        <span>Filtrar por Tipo</span>
+      </div>
+      <div class="filter-buttons">
+        <a href="?tipo=todos" 
+           class="filter-btn {% if tipo_filtro == 'todos' %}active{% endif %}">
+          <span>📄</span>
+          <span>Todos</span>
+        </a>
+        <a href="?tipo=documento" 
+           class="filter-btn {% if tipo_filtro == 'documento' %}active{% endif %}">
+          <span>📄</span>
+          <span>Documentos</span>
+        </a>
+        <a href="?tipo=contrato" 
+           class="filter-btn {% if tipo_filtro == 'contrato' %}active{% endif %}">
+          <span>📜</span>
+          <span>Contratos</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Tipo</th>
+              <th>Emissão</th>
+              <th>Vencimento</th>
+              <th>Prazo</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in page_obj %}
+            <tr>
+              <td><strong>{{ doc.titulo }}</strong></td>
+              <td>{{ doc.get_tipo_display }}</td>
+              <td>{{ doc.data_emissao|date:"d/m/Y" }}</td>
+              <td>{{ doc.data_vencimento|date:"d/m/Y" }}</td>
+              <td>
+                {% if doc.data_vencimento < hoje %}
+                  <span class="status-badge badge-vencido">❌ Vencido</span>
+                {% elif doc.data_vencimento <= hoje_plus_60 %}
+                  <span class="status-badge badge-a-vencer">⚠️ A Vencer</span>
+                {% else %}
+                  <span class="status-badge badge-em-dia">✅ Em Dia</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if doc.status_aprovacao == 'aprovado' %}
+                  <span class="status-badge badge-aprovado">✅ Aprovado</span>
+                {% elif doc.status_aprovacao == 'reprovado' %}
+                  <span class="status-badge badge-reprovado">❌ Reprovado</span>
+                {% else %}
+                  <span class="status-badge badge-pendente">⏳ Pendente</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'detalhar_documento' tipo=doc.tipo doc_id=doc.id %}" 
+                   class="btn-detail"
+                   title="Ver detalhes">
+                  <span>🔍</span>
+                  <span>Detalhar</span>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <div class="empty-icon">📭</div>
+                  <div class="empty-text">Nenhum documento ou contrato encontrado</div>
+                  <p style="margin-top: 1rem; color: #94a3b8;">
+                    Experimente ajustar os filtros ou adicione um novo documento
+                  </p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+      <ul class="pagination-modern">
+        {% if page_obj.has_previous %}
+          <li class="page-item-modern">
+            <a class="page-link-modern" 
+               href="?page={{ page_obj.previous_page_number }}{% if tipo_filtro != 'todos' %}&tipo={{ tipo_filtro }}{% endif %}">
+              ‹
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item-modern disabled">
+            <span class="page-link-modern">‹</span>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item-modern active">
+              <span class="page-link-modern">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item-modern">
+              <a class="page-link-modern" 
+                 href="?page={{ num }}{% if tipo_filtro != 'todos' %}&tipo={{ tipo_filtro }}{% endif %}">
+                {{ num }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item-modern">
+            <a class="page-link-modern" 
+               href="?page={{ page_obj.next_page_number }}{% if tipo_filtro != 'todos' %}&tipo={{ tipo_filtro }}{% endif %}">
+              ›
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item-modern disabled">
+            <span class="page-link-modern">›</span>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

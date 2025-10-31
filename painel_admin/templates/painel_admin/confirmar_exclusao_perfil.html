@@ -1,0 +1,21 @@
+{% extends 'base_admin.html' %}
+{% block title %}Confirmar Exclusão de Perfil{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="card shadow-sm border-danger">
+    <div class="card-header bg-danger text-white d-flex align-items-center">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> <!-- Bootstrap Icons -->
+      <h5 class="mb-0">Confirmar Exclusão</h5>
+    </div>
+    <div class="card-body">
+      <p class="fs-5">
+        Tem certeza que deseja excluir o perfil de 
+        <strong>{{ perfil.usuario.username }}</strong>?
+      </p>
+
+      {% include 'documentos/includes/confirm_delete_card.html' with doc=None action_url=delete_action_url cancel_url=cancel_url %}
+    </div>
+  </div>
+</div>
+{% endblock %}

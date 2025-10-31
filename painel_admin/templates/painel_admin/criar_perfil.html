@@ -1,0 +1,34 @@
+{% extends 'base_admin.html' %}
+{% load widget_tweaks %}
+{% block title %}Criar Perfil{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+  <h3 class="text-center mb-4 text-primary">
+    <i class="fas fa-user-plus"></i> Criar Novo Perfil
+  </h3>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="id_usuario" class="form-label">Usuário</label>
+      {{ form.usuario|add_class:"form-select" }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_shopping" class="form-label">Shopping</label>
+      {{ form.shopping|add_class:"form-select" }}
+    </div>
+
+    <div class="d-flex justify-content-between mt-3">
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Salvar
+      </button>
+      <a href="{% url 'listar_perfis' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

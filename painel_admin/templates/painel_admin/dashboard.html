@@ -1,0 +1,48 @@
+{% extends 'base_admin.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="text-center mb-4">🛠️ Painel Administrativo</h3>
+
+  <div class="row text-center">
+    <div class="col-md-4 mb-3">
+      <div class="card shadow border-primary">
+        <div class="card-body">
+          <h5 class="card-title text-primary"><i class="fas fa-store"></i> Total de Shoppings</h5>
+          <p class="fs-3 text-primary">{{ total_shoppings }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow border-success">
+        <div class="card-body">
+          <h5 class="card-title text-success"><i class="fas fa-users"></i> Total de Usuários</h5>
+          <p class="fs-3 text-success">{{ total_usuarios }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card shadow border-secondary">
+        <div class="card-body">
+          <h5 class="card-title text-secondary"><i class="fas fa-layer-group"></i> Total de Grupos</h5>
+          <p class="fs-3 text-secondary">{{ total_grupos }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4 d-flex flex-wrap justify-content-center gap-3">
+    <a href="{% url 'listar_shoppings' %}" class="btn btn-outline-primary btn-lg">
+      <i class="fas fa-store"></i> Gerenciar Shoppings
+    </a>
+    <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-success btn-lg">
+      <i class="fas fa-users"></i> Gerenciar Usuários
+    </a>
+    <a href="{% url 'listar_grupos' %}" class="btn btn-outline-secondary btn-lg">
+      <i class="fas fa-layer-group"></i> Gerenciar Grupos
+    </a>
+    <a href="{% url 'painel_geral' %}" class="btn btn-dark btn-lg">
+      <i class="fas fa-arrow-left"></i> Voltar para Painel de Contratos
+    </a>
+  </div>
+</div>
+{% endblock %}

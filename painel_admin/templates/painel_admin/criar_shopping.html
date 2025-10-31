@@ -1,0 +1,44 @@
+{% extends 'base_admin.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Criar Shopping{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+  <h3 class="text-center mb-4 text-primary"><i class="fas fa-store"></i> Novo Shopping</h3>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="id_nome" class="form-label">Nome</label>
+      {{ form.nome|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_sigla" class="form-label">Sigla</label>
+      {{ form.sigla|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_cnpj" class="form-label">CNPJ</label>
+      {{ form.cnpj|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+      <label for="id_email_alertas" class="form-label">E-mail de Alertas</label>
+      {{ form.email_alertas|add_class:"form-control" }}
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-save"></i> Salvar
+      </button>
+      <a href="{% url 'listar_shoppings' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Cancelar
+      </a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

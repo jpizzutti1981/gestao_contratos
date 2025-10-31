@@ -1,0 +1,11 @@
+{% extends 'base_admin.html' %}
+{% block content %}
+<h2>✏️ Editar Grupo</h2>
+<form method="post">{% csrf_token %}
+  <div class="mb-3">
+    <label>Nome do Grupo:</label>
+    <input type="text" name="name" value="{{ grupo.name }}" class="form-control">
+  </div>
+  <button type="submit" class="btn btn-primary">Salvar</button>
+</form>
+{% endblock %}

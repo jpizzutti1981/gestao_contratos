@@ -1,0 +1,980 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .panel-wrapper {
+    padding: 2rem 0;
+  }
+
+  .panel-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .panel-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .btn-import {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-import:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+    color: white;
+  }
+
+  .quick-add-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border-left: 4px solid #0ba360;
+  }
+
+  .section-label {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .filter-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    transition: border-color 0.2s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .btn-outline-primary {
+    border: 2px solid #667eea;
+    color: #667eea;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  .btn-outline-primary:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow-x: auto;
+  }
+
+  .table {
+    margin-bottom: 0;
+  }
+
+  .table thead {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  }
+
+  .table th {
+    font-weight: 700;
+    color: #475569;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 1rem;
+  }
+
+  .table td {
+    padding: 1rem;
+    vertical-align: middle;
+  }
+
+  .table tbody tr {
+    transition: background 0.2s;
+  }
+
+  .table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .badge {
+    padding: 0.4em 0.8em;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .btn-group .btn {
+    border-radius: 8px;
+  }
+
+  .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .pagination {
+    margin: 1.5rem 0 0;
+    justify-content: center;
+  }
+
+  .page-link {
+    border-radius: 8px;
+    margin: 0 0.2rem;
+    border: 2px solid #e2e8f0;
+    color: #667eea;
+    font-weight: 600;
+  }
+
+  .page-link:hover {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+  }
+
+  .page-item.active .page-link {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: transparent;
+  }
+
+  /* Estilos específicos para botões do modal de confirmação */
+  .btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #111827;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-modern:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+  }
+
+  .btn-cancel {
+    background: transparent !important;
+    border: 1px solid #e5e7eb !important;
+    color: #6b7280 !important;
+  }
+
+  .btn-cancel:hover {
+    background: #f9fafb !important;
+    border-color: #d1d5db !important;
+    color: #374151 !important;
+  }
+
+  .btn-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #dc2626, #b91c1c) !important;
+    color: #fff !important;
+    border: 0 !important;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-delete:hover {
+    background: linear-gradient(180deg, #b91c1c, #991b1b) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-delete[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .btn-delete.loading {
+    position: relative;
+    color: transparent;
+  }
+
+  .btn-delete.loading::after {
+    content: "";
+    position: absolute;
+    right: 12px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Ícones dos KPIs */
+  .kpi-card .card-body {
+    padding: 1rem 1.25rem;
+  }
+  .kpi-icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    margin-right: 12px;
+    font-size: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  }
+  .kpi-icon-total { background: linear-gradient(135deg, #6366F1, #8B5CF6); }
+  .kpi-icon-pendente { background: linear-gradient(135deg, #F59E0B, #F97316); }
+  .kpi-icon-concluido { background: linear-gradient(135deg, #10B981, #34D399); }
+
+  /* Overlay de carregamento da página */
+  #page-loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(1px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+  .page-loading-spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid rgba(99,102,241,0.35);
+    border-top-color: #6366F1;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @media (max-width: 768px) {
+    .panel-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .panel-title {
+      font-size: 1.4rem;
+    }
+    
+    .quick-add-section, .filter-section {
+      padding: 1rem;
+    }
+    
+    .table-container {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<!-- Overlay de carregamento global -->
+<div id="page-loading-overlay"><div class="page-loading-spinner"></div></div>
+
+<div class="container panel-wrapper">
+  
+  <div class="panel-header">
+    <h1 class="panel-title">📋 Documentos Obrigatórios</h1>
+    {% if request.user.groups.first.name in 'Corporativo Gestor' or request.user.is_superuser %}
+      <a href="{% url 'importar_documentos_excel' %}?next={{ request.get_full_path|urlencode }}" 
+         class="btn btn-import">
+        📥 Importar Excel
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-3">
+    <div class="col-12 col-md-4">
+      <div class="card border-0 shadow-sm kpi-card" style="border-left:4px solid #667eea;">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="kpi-icon-circle kpi-icon-total">📄</div>
+            <div>
+              <div class="fw-bold">Itens Obrigatórios</div>
+              <div class="text-muted small">Conjunto atual (com filtros)</div>
+            </div>
+          </div>
+          <div class="fs-4 fw-bold">{{ kpis.total }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4">
+      <div class="card border-0 shadow-sm kpi-card" style="border-left:4px solid #f59e0b;">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="kpi-icon-circle kpi-icon-pendente">⏳</div>
+            <div>
+              <div class="fw-bold">Pendentes</div>
+              <div class="text-muted small">{{ kpis.percent_pendentes }}%</div>
+            </div>
+          </div>
+          <div class="fs-4 fw-bold">{{ kpis.pendentes }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4">
+      <div class="card border-0 shadow-sm kpi-card" style="border-left:4px solid #10b981;">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="kpi-icon-circle kpi-icon-concluido">✅</div>
+            <div>
+              <div class="fw-bold">Concluídos</div>
+              <div class="text-muted small">{{ kpis.percent_concluidos }}%</div>
+            </div>
+          </div>
+          <div class="fs-4 fw-bold">{{ kpis.concluidos }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if is_paginated %}
+  <nav aria-label="Páginas">
+    <ul class="pagination pagination-sm">
+      {% with qs=qs_no_page %}
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if qs %}&{{ qs }}{% endif %}">‹</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">‹</span></li>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+          {% if num == page_obj.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% else %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if qs %}&{{ qs }}{% endif %}">{{ num }}</a></li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if qs %}&{{ qs }}{% endif %}">›</a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">›</span></li>
+        {% endif %}
+      {% endwith %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  <div class="quick-add-section">
+    <div class="section-label">➕ Adicionar Documento Rápido</div>
+    <form id="form-criar-doc" method="post" action="{% url 'create_documento_obrigatorio' %}" class="row g-2 align-items-end">
+      {% csrf_token %}
+      <div class="col-md-2">
+        <label class="form-label">Área</label>
+        <input name="area" class="form-control form-control-sm" placeholder="Ex: Operações">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Categoria</label>
+        <input name="categoria" class="form-control form-control-sm" placeholder="Categoria">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Nome</label>
+        <input name="nome" required class="form-control form-control-sm" placeholder="Nome do documento">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Shopping</label>
+        <select name="shopping" class="form-select form-select-sm">
+          <option value="">Selecione...</option>
+          {% for s in shopping_list %}
+            <option value="{{ s.id }}">{{ s.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Adicionar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="filter-section">
+    <div class="section-label">🔍 Filtros</div>
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-2">
+        <label class="form-label">Área</label>
+        <select name="area" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for a in area_list %}
+            <option value="{{ a }}" {% if filtro_area == a %}selected{% endif %}>{{ a }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Categoria</label>
+        <select name="categoria" class="form-select form-select-sm">
+          <option value="">Todas</option>
+          {% for c in categoria_list %}
+            <option value="{{ c }}" {% if filtro_categoria == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Shopping</label>
+        <select name="shopping" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          {% for s in shopping_list %}
+            <option value="{{ s.id }}" {% if filtro_shopping == s.id|stringformat:"s" %}selected{% endif %}>{{ s.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">Todos</option>
+          <option value="pendente" {% if filtro_status == 'pendente' %}selected{% endif %}>Pendente</option>
+          <option value="concluido" {% if filtro_status == 'concluido' %}selected{% endif %}>Concluído</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-outline-primary btn-sm w-100">Filtrar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-container">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Área</th>
+            <th>Categoria</th>
+            <th>Shopping</th>
+            <th>Documento</th>
+            <th>Status</th>
+            <th>Anexo</th>
+            <th>Envio</th>
+            <th>Atualização</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if documentos %}
+            {% for item in documentos %}
+              <tr id="doc-row-{{ item.obj.id }}" data-doc-id="{{ item.obj.id }}">
+                <td>{{ item.obj.area }}</td>
+                <td>{{ item.obj.categoria }}</td>
+                <td class="doc-shopping-cell">{{ item.obj.shopping.nome }}</td>
+                <td><strong>{{ item.obj.nome }}</strong></td>
+                <td class="doc-status-cell">
+                  {% if item.status == 'enviado' %}
+                    <span class="badge bg-success">Enviado</span>
+                  {% else %}
+                    <span class="badge bg-danger">Pendente</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.anexo %}
+                    <a href="{{ item.anexo.arquivo.url }}" target="_blank" class="doc-anexo-link">Ver anexo</a>
+                  {% else %}
+                    <span class="doc-anexo-link text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.data_envio %}
+                    {{ item.data_envio|date:'d/m/Y H:i' }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.ultima_atualizacao %}
+                    {{ item.ultima_atualizacao|date:'d/m/Y H:i' }}
+                  {% else %}
+                    —
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-1">
+                    <div class="btn-group" role="group">
+                      {% if item.anexo %}
+                        <a href="{% url 'detalhar_documento' tipo=item.anexo.documento.tipo doc_id=item.anexo.documento.id %}" 
+                           class="btn btn-sm btn-outline-primary doc-ver-btn">Ver</a>
+                      {% else %}
+                        <a href="#" class="btn btn-sm btn-outline-secondary disabled doc-ver-btn">Ver</a>
+                      {% endif %}
+                      <a href="{% url 'ver_historico_documento' item.historico_titulo|urlencode item.historico_shopping_id %}" 
+                         class="btn btn-sm btn-outline-secondary">Histórico</a>
+                      <a href="{% url 'novo_documento_shopping' item.obj.shopping.id %}?titulo={{ item.obj.nome|urlencode }}" 
+                         class="btn btn-sm btn-success">Inserir</a>
+                      <button type="button"
+                              class="btn btn-sm btn-outline-info btn-vincular"
+                              data-doc-obrig-id="{{ item.obj.id }}"
+                              data-doc-obrig-nome="{{ item.obj.nome }}">
+                        Vincular avulso
+                      </button>
+                    </div>
+                    <form method="post" action="{% url 'excluir_documento_obrigatorio' item.obj.id %}" class="excluir-doc-form">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Excluir</button>
+                    </form>
+                    {% if item.obj.documento_vinculado %}
+                      <form method="post" action="{% url 'desvincular_documento_obrigatorio' item.obj.id %}" class="form-desvincular ms-1">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-warning">Desvincular</button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="9" class="text-center text-muted py-4">
+                <div style="font-size:2rem;margin-bottom:0.5rem;">📭</div>
+                Nenhum documento encontrado
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+ 
+<!-- Modal de confirmação para exclusão (substitui confirm() do navegador) -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirmDeleteMessage">Confirma exclusão deste documento obrigatório?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modern btn-cancel" data-bs-dismiss="modal" aria-label="Cancelar exclusão">❌ Cancelar</button>
+        <button type="button" id="confirmDeleteBtn" class="btn-modern btn-delete" aria-label="Confirmar exclusão">🗑️ <span id="confirmDeleteBtnText">Confirmar</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para vincular documento avulso -->
+<div class="modal fade" id="vincularModal" tabindex="-1" aria-labelledby="vincularModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="vincularModalLabel">Vincular documento avulso</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">Premissa: <strong id="premissaNome">—</strong></div>
+        <input id="buscaAvulsoInput" class="form-control form-control-sm" placeholder="Buscar por título do documento avulso..." />
+        <div id="resultadosAvulsos" class="mt-3"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function ensureMessageContainer(){
+    let container = document.getElementById('message-container');
+    if(!container){
+      container = document.createElement('div');
+      container.id = 'message-container';
+      container.style.cssText = 'position:fixed;top:80px;right:20px;z-index:9999;max-width:400px;';
+      document.body.prepend(container);
+    }
+    return container;
+  }
+
+  function showTemporaryMessage(text, type='success'){
+    const container = ensureMessageContainer();
+    const div = document.createElement('div');
+    div.className = `alert alert-${type} alert-dismissible fade show`;
+    div.setAttribute('role','alert');
+    div.innerHTML = `
+      ${type==='success'? '✅' : 'ℹ️'} ${text}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    container.prepend(div);
+    setTimeout(()=>{ try{ const bsAlert = bootstrap.Alert.getOrCreateInstance(div); bsAlert.close(); }catch(e){} }, 4000);
+  }
+
+  // Overlay de carregamento da página
+  const pageOverlay = document.getElementById('page-loading-overlay');
+  function showPageLoading(){ if(pageOverlay){ pageOverlay.style.display = 'flex'; } }
+  function hidePageLoading(){ if(pageOverlay){ pageOverlay.style.display = 'none'; } }
+
+  const forms = document.querySelectorAll('form[data-marcar-obrigatorio]');
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e){
+      if (e.shiftKey || e.ctrlKey || e.metaKey) return;
+      e.preventDefault();
+      const action = form.getAttribute('action');
+      const csrfInput = form.querySelector('input[name=csrfmiddlewaretoken]');
+      const csrf = csrfInput ? csrfInput.value : null;
+      if(!csrf){ form.submit(); return; }
+      const btn = form.querySelector('button[type=submit]');
+      btn.disabled = true;
+      const originalClasses = btn.className;
+      const originalText = btn.textContent;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+      fetch(action, {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest'},
+        body: new URLSearchParams({'csrfmiddlewaretoken': csrf})
+      }).then(async r => {
+        const data = await r.json().catch(()=>null);
+        if(r.ok && data && data.success){
+          if(data.marcado_ok){
+            btn.className = originalClasses.replace('btn-success','btn-outline-danger');
+            btn.textContent = 'Reverter';
+          } else {
+            btn.className = originalClasses.replace('btn-outline-danger','btn-success');
+            btn.textContent = 'Marcar OK';
+          }
+          showTemporaryMessage('Status atualizado com sucesso.', 'success');
+        } else {
+          showTemporaryMessage((data && data.error) ? data.error : 'Erro ao atualizar.', 'danger');
+        }
+      }).catch(err => {
+        console.error(err);
+        showTemporaryMessage('Erro de rede ao atualizar.', 'danger');
+      }).finally(()=>{ btn.disabled = false; });
+    });
+  });
+
+  async function atualizarStatusPainel(){
+    try{
+      const resp = await fetch("{% url 'painel_documentos_status_json' %}", {headers: {'X-Requested-With': 'XMLHttpRequest'}});
+      if(!resp.ok) return;
+      const dados = await resp.json();
+      dados.forEach(item => {
+        const row = document.getElementById(`doc-row-${item.id}`);
+        if(!row) return;
+        const statusCell = row.querySelector('.doc-status-cell');
+        if(statusCell){
+          if(item.status === 'concluido'){
+            statusCell.innerHTML = '<span class="badge bg-success">Concluído</span>';
+          } else {
+            statusCell.innerHTML = '<span class="badge bg-danger">Pendente</span>';
+          }
+        }
+        const anexoEl = row.querySelector('.doc-anexo-link');
+        if(anexoEl){
+          if(item.anexo_url){
+            anexoEl.textContent = 'Ver anexo';
+            anexoEl.setAttribute('href', item.anexo_url);
+            anexoEl.setAttribute('target','_blank');
+          } else {
+            anexoEl.textContent = '—';
+            anexoEl.removeAttribute('href');
+          }
+        }
+        const verBtn = row.querySelector('.doc-ver-btn');
+        if(verBtn){
+          if(item.detalhe_url){
+            verBtn.classList.remove('disabled','btn-outline-secondary');
+            verBtn.classList.add('btn-outline-primary');
+            verBtn.setAttribute('href', item.detalhe_url);
+          } else {
+            verBtn.classList.add('disabled','btn-outline-secondary');
+            verBtn.classList.remove('btn-outline-primary');
+            verBtn.setAttribute('href', '#');
+          }
+        }
+        const dataEnvioCell = row.querySelector('td:nth-child(7)');
+        if(dataEnvioCell) dataEnvioCell.textContent = item.data_envio || '—';
+        const ultimaCell = row.querySelector('td:nth-child(8)');
+        if(ultimaCell) ultimaCell.textContent = item.ultima_atualizacao || '—';
+        const shopCell = row.querySelector('.doc-shopping-cell');
+        if(shopCell) shopCell.textContent = item.shopping_name || shopCell.textContent;
+      });
+    }catch(e){
+      console.error('Erro ao atualizar status do painel', e);
+    }
+  }
+
+  setInterval(atualizarStatusPainel, 10000);
+  atualizarStatusPainel();
+
+  // Modal-based confirmation for deletions (replaces browser confirm())
+  // Insert a single shared modal in the page (see markup below). When a delete form is triggered,
+  // we store the form reference and show the modal. On confirm, we perform the same AJAX request.
+  let pendingDeleteForm = null;
+  const confirmModalEl = document.getElementById('confirmDeleteModal');
+  let confirmModal = null;
+  if (confirmModalEl && typeof bootstrap !== 'undefined') {
+    confirmModal = new bootstrap.Modal(confirmModalEl);
+  }
+
+  document.querySelectorAll('form.excluir-doc-form').forEach(form => {
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      pendingDeleteForm = form;
+      // set optional message (we can include document name if desired)
+      const row = form.closest('tr');
+      const nome = row ? (row.querySelector('td strong') ? row.querySelector('td strong').textContent : '') : '';
+      const msgEl = document.getElementById('confirmDeleteMessage');
+      if(msgEl){
+        msgEl.textContent = nome ? `Confirma exclusão de "${nome}" ?` : 'Confirma exclusão deste documento obrigatório?';
+      }
+      if(confirmModal){ confirmModal.show(); } else { // fallback to old confirm
+        if(!confirm('Confirma exclusão deste documento obrigatório?')){ pendingDeleteForm = null; return; }
+        performDelete(pendingDeleteForm);
+      }
+    });
+  });
+
+  // Handler for modal confirm button
+  const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+  if(confirmDeleteBtn){
+    confirmDeleteBtn.addEventListener('click', function(e){
+      if(!pendingDeleteForm){
+        if(confirmModal) confirmModal.hide();
+        return;
+      }
+      // perform the same AJAX delete as before
+      performDelete(pendingDeleteForm, confirmModal);
+    });
+  }
+
+  // When modal opens, move focus to confirm button for accessibility
+  if(confirmModalEl){
+    confirmModalEl.addEventListener('shown.bs.modal', function(){
+      const btn = document.getElementById('confirmDeleteBtn');
+      if(btn){ btn.focus(); }
+    });
+    // Ensure ESC or backdrop close resets pending form
+    confirmModalEl.addEventListener('hidden.bs.modal', function(){ pendingDeleteForm = null; });
+  }
+
+  function performDelete(form, modalInstance){
+    const action = form.getAttribute('action');
+    const csrfInput = form.querySelector('input[name=csrfmiddlewaretoken]');
+    const csrf = csrfInput ? csrfInput.value : null;
+    if(!csrf){ form.submit(); return; }
+    // disable confirm button to avoid double clicks
+    if(confirmDeleteBtn){ 
+      confirmDeleteBtn.disabled = true; 
+      const textEl = document.getElementById('confirmDeleteBtnText');
+      if(textEl){ textEl.textContent = 'Excluindo...'; }
+      // add spinner class
+      confirmDeleteBtn.classList.add('loading');
+    }
+    fetch(action, {
+      method:'POST',
+      headers: {'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest'},
+      body: new URLSearchParams({'csrfmiddlewaretoken': csrf})
+    }).then(r => r.json()).then(data => {
+      if(data && data.success){
+        const row = form.closest('tr');
+        if(row) row.remove();
+        showTemporaryMessage('Documento obrigatório excluído.', 'success');
+        if(modalInstance) modalInstance.hide();
+      } else {
+        showTemporaryMessage((data && data.error) ? data.error : 'Erro ao excluir.', 'danger');
+      }
+    }).catch(err => {
+      console.error(err);
+      showTemporaryMessage('Erro de rede ao excluir.', 'danger');
+    }).finally(() => {
+      if(confirmDeleteBtn){ confirmDeleteBtn.disabled = false; const textEl = document.getElementById('confirmDeleteBtnText'); if(textEl){ textEl.textContent = 'Confirmar'; } confirmDeleteBtn.classList.remove('loading'); }
+      pendingDeleteForm = null;
+    });
+  }
+
+  const formCriar = document.getElementById('form-criar-doc');
+  if(formCriar){
+    formCriar.addEventListener('submit', function(e){
+      e.preventDefault();
+      const formData = new FormData(formCriar);
+      const action = formCriar.getAttribute('action');
+      const csrf = formData.get('csrfmiddlewaretoken');
+      if(!csrf){ formCriar.submit(); return; }
+      fetch(action, {
+        method: 'POST', 
+        headers: {'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest'}, 
+        body: formData
+      }).then(r => r.json()).then(data => {
+        if(data && data.success){
+          showTemporaryMessage(data.created ? 'Documento criado.' : 'Documento já existia.', 'success');
+          if(data.created) atualizarStatusPainel();
+          formCriar.querySelectorAll('input[name], select[name]').forEach(i => { 
+            if(i.name!=='csrfmiddlewaretoken') i.value = ''; 
+          });
+        } else {
+          showTemporaryMessage((data && data.error) ? data.error : 'Erro ao criar documento.', 'danger');
+        }
+      }).catch(err => { 
+        console.error(err); 
+        showTemporaryMessage('Erro de rede ao criar documento.', 'danger'); 
+      });
+    });
+  }
+
+  // Vincular avulso: abrir modal e buscar
+  const vincularModalEl = document.getElementById('vincularModal');
+  const vincularModal = vincularModalEl && window.bootstrap ? new bootstrap.Modal(vincularModalEl) : null;
+  let currentDocObrigId = null;
+  const premissaNomeEl = document.getElementById('premissaNome');
+  const buscaInputEl = document.getElementById('buscaAvulsoInput');
+  const resultadosEl = document.getElementById('resultadosAvulsos');
+
+  document.querySelectorAll('.btn-vincular').forEach(btn => {
+    btn.addEventListener('click', function(){
+      currentDocObrigId = this.getAttribute('data-doc-obrig-id');
+      const nome = this.getAttribute('data-doc-obrig-nome');
+      if(premissaNomeEl) premissaNomeEl.textContent = nome || '—';
+      if(buscaInputEl) buscaInputEl.value = '';
+      if(resultadosEl) resultadosEl.innerHTML = '';
+      if(vincularModal) vincularModal.show();
+
+      // Busca inicial (sem termo) para já carregar os últimos avulsos do shopping
+      if(currentDocObrigId){
+        fetch(`{% url 'buscar_documentos_avulsos_json' 0 %}`.replace('/0/', `/${currentDocObrigId}/`), {
+          headers: {'X-Requested-With': 'XMLHttpRequest'}
+        }).then(r => r.json()).then(data => {
+          renderResultados((data && data.results) ? data.results : []);
+        }).catch(err => { console.error(err); });
+      }
+    });
+  });
+
+  function renderResultados(lista){
+    if(!resultadosEl) return;
+    if(!lista || lista.length === 0){
+      resultadosEl.innerHTML = '<div class="text-muted">Nenhum documento encontrado.</div>';
+      return;
+    }
+    const csrf = document.querySelector('input[name=csrfmiddlewaretoken]')?.value || '';
+    resultadosEl.innerHTML = lista.map(item => {
+      return `
+        <div class=\"d-flex align-items-center justify-content-between border rounded p-2 mb-2\">
+          <div>
+            <div><strong>${item.titulo}</strong></div>
+            <div class=\"text-muted small\">${item.tipo} • ${item.status} • ${item.data_envio}</div>
+          </div>
+          <div>
+            <button class=\"btn btn-sm btn-outline-primary btn-do-vincular\" data-doc-id=\"${item.id}\">Vincular</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    resultadosEl.querySelectorAll('.btn-do-vincular').forEach(b => {
+      b.addEventListener('click', function(){
+        const docId = this.getAttribute('data-doc-id');
+        if(!currentDocObrigId || !docId) return;
+        showPageLoading();
+        fetch(`{% url 'vincular_documento_obrigatorio' 0 %}`.replace('/0/', `/${currentDocObrigId}/`), {
+          method: 'POST',
+          headers: {'X-Requested-With': 'XMLHttpRequest', 'Content-Type': 'application/x-www-form-urlencoded'},
+          body: new URLSearchParams({csrfmiddlewaretoken: csrf, doc_id: docId})
+        }).then(r => r.json()).then(data => {
+          if(data && data.success){
+            showTemporaryMessage('Vinculado com sucesso.', 'success');
+            if(vincularModal) vincularModal.hide();
+            // Recarrega a página para garantir que o documento apareça totalmente
+            window.location.reload();
+          } else {
+            showTemporaryMessage((data && data.error) ? data.error : 'Erro ao vincular.', 'danger');
+            hidePageLoading();
+          }
+        }).catch(err => { console.error(err); showTemporaryMessage('Erro de rede ao vincular.', 'danger'); hidePageLoading(); });
+      });
+    });
+  }
+
+  if(buscaInputEl){
+    let debounceTimer = null;
+    buscaInputEl.addEventListener('input', function(){
+      clearTimeout(debounceTimer);
+      const termo = this.value.trim();
+      debounceTimer = setTimeout(() => {
+        if(!currentDocObrigId) return;
+        fetch(`{% url 'buscar_documentos_avulsos_json' 0 %}`.replace('/0/', `/${currentDocObrigId}/`) + `?q=${encodeURIComponent(termo)}`, {
+          headers: {'X-Requested-With': 'XMLHttpRequest'}
+        }).then(r => r.json()).then(data => {
+          renderResultados((data && data.results) ? data.results : []);
+        }).catch(err => { console.error(err); });
+      }, 250);
+    });
+  }
+
+  // Desvincular via formulário padrão com overlay + reload
+  document.querySelectorAll('.form-desvincular').forEach(form => {
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      const fd = new FormData(form);
+      showPageLoading();
+      fetch(form.action, {method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'}, body: fd})
+        .then(r => r.json()).then(data => {
+          if(data && data.success){
+            showTemporaryMessage('Vinculação removida.', 'info');
+            window.location.reload();
+          } else {
+            showTemporaryMessage((data && data.error) ? data.error : 'Erro ao desvincular.', 'danger');
+            hidePageLoading();
+          }
+        }).catch(err => { console.error(err); showTemporaryMessage('Erro de rede ao desvincular.', 'danger'); hidePageLoading(); });
+    });
+  });
+});
+</script>
+{% endblock %}

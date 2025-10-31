@@ -1,0 +1,28 @@
+{% extends 'base_admin.html' %}
+{% block title %}Novo Grupo{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+  <h3 class="text-primary mb-4 text-center">
+    <i class="fas fa-layer-group"></i> Criar Novo Grupo
+  </h3>
+
+  <form method="post">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+      <label for="nome" class="form-label">Nome do Grupo</label>
+      <input type="text" name="nome" id="nome" class="form-control" placeholder="Digite o nome do grupo" required>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-check-circle"></i> Salvar
+      </button>
+      <a href="{% url 'listar_grupos' %}" class="btn btn-secondary">
+        <i class="fas fa-times"></i> Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

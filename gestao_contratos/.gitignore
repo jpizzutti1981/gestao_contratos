@@ -1,0 +1,16 @@
+# Ambiente virtual
+venv/
+
+# Arquivos de ambiente
+.env
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+
+# Banco de dados local
+db.sqlite3
+
+# Migrations (opcional)
+**/migrations/*.py
+!**/migrations/__init__.py

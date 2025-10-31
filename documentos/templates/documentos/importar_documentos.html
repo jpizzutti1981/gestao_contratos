@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .import-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .import-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+  }
+
+  .card-header-import {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 2rem;
+    border: none;
+  }
+
+  .header-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+  }
+
+  .header-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 0;
+    text-align: center;
+  }
+
+  .header-subtitle {
+    text-align: center;
+    opacity: 0.95;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .card-body-import {
+    padding: 2.5rem;
+  }
+
+  .info-box {
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    border-left: 4px solid #00acc1;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .info-box-title {
+    font-weight: 700;
+    color: #006064;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-box-text {
+    color: #006064;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .info-box-list {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0.75rem;
+  }
+
+  .info-box-list li {
+    padding-left: 1.5rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-box-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #00acc1;
+    font-weight: bold;
+  }
+
+  .form-group-import {
+    margin-bottom: 2rem;
+  }
+
+  .form-label-import {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .file-upload-wrapper {
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .file-upload-wrapper:hover {
+    border-color: #667eea;
+    background: #f1f5f9;
+  }
+
+  .file-upload-wrapper.dragover {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+  }
+
+  .file-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #667eea;
+  }
+
+  .file-text {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+  }
+
+  .file-hint {
+    color: #64748b;
+    font-size: 0.85rem;
+  }
+
+  input[type="file"] {
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+  }
+
+  .file-selected {
+    background: linear-gradient(135deg, #0ba36015, #3cba9215);
+    border-color: #0ba360;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    display: none;
+  }
+
+  .file-selected.active {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .file-selected-icon {
+    font-size: 2rem;
+    color: #0ba360;
+  }
+
+  .file-selected-info {
+    flex: 1;
+    text-align: left;
+  }
+
+  .file-selected-name {
+    font-weight: 700;
+    color: #0ba360;
+    margin-bottom: 0.25rem;
+  }
+
+  .file-selected-size {
+    font-size: 0.85rem;
+    color: #059669;
+  }
+
+  .form-select-import {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+  }
+
+  .form-select-import:focus {
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    outline: none;
+  }
+
+  .form-text-import {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+    margin-top: 2rem;
+  }
+
+  .btn-modern {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-import {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+  }
+
+  .btn-import:hover {
+    color: white;
+  }
+
+  .btn-import:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-cancel {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  .btn-cancel:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: white;
+  }
+
+  @media (max-width: 768px) {
+    .import-container {
+      padding: 0 1rem;
+    }
+
+    .card-header-import {
+      padding: 1.5rem;
+    }
+
+    .header-icon {
+      width: 60px;
+      height: 60px;
+      font-size: 1.8rem;
+    }
+
+    .header-title {
+      font-size: 1.3rem;
+    }
+
+    .card-body-import {
+      padding: 1.5rem;
+    }
+
+    .action-buttons {
+      flex-direction: column-reverse;
+    }
+  }
+</style>
+
+<div class="container mt-4">
+  <div class="import-container">
+    <div class="import-card card">
+      
+      <div class="card-header-import">
+        <div class="header-icon">📊</div>
+        <h1 class="header-title">Importar Documentos</h1>
+        <p class="header-subtitle">Faça upload do arquivo Excel com os documentos obrigatórios</p>
+      </div>
+
+      <div class="card-body-import">
+        
+        <div class="info-box">
+          <div class="info-box-title">
+            <span>ℹ️</span>
+            <span>Formato do Arquivo</span>
+          </div>
+          <p class="info-box-text">
+            O arquivo deve ser .xlsx (Excel) contendo as seguintes colunas:
+          </p>
+          <ul class="info-box-list">
+            <li><strong>Área</strong> - Área do documento</li>
+            <li><strong>Categoria</strong> - Categoria do documento</li>
+            <li><strong>Nome</strong> - Nome do documento</li>
+            <li><strong>Tipo</strong> - Tipo do documento (opcional)</li>
+          </ul>
+          <p class="info-box-text mb-0">
+            <strong>Importante:</strong> A primeira linha será considerada como cabeçalho.
+          </p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="importForm">
+          {% csrf_token %}
+          
+          {% if next %}
+          <input type="hidden" name="next" value="{{ next }}">
+          {% endif %}
+
+          <div class="form-group-import">
+            <label class="form-label-import">
+              <span>📁</span>
+              <span>{{ form.arquivo.label }}</span>
+            </label>
+            
+            <div class="file-upload-wrapper" id="fileUploadWrapper">
+              <div class="file-icon">📤</div>
+              <div class="file-text">Clique para selecionar o arquivo</div>
+              <div class="file-hint">ou arraste e solte aqui</div>
+              {{ form.arquivo }}
+            </div>
+
+            <div class="file-selected" id="fileSelected">
+              <div class="file-selected-icon">📄</div>
+              <div class="file-selected-info">
+                <div class="file-selected-name" id="fileName"></div>
+                <div class="file-selected-size" id="fileSize"></div>
+              </div>
+            </div>
+          </div>
+
+          {% if form.shopping %}
+          <div class="form-group-import">
+            <label class="form-label-import" for="{{ form.shopping.id_for_label }}">
+              <span>🏢</span>
+              <span>{{ form.shopping.label }}</span>
+            </label>
+            <select name="{{ form.shopping.name }}" 
+                    id="{{ form.shopping.id_for_label }}" 
+                    class="form-select form-select-import">
+              <option value="">Selecione um shopping (opcional)</option>
+              {% for choice in form.shopping.field.queryset %}
+                <option value="{{ choice.id }}">{{ choice }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text-import">
+              <span>💡</span>
+              <span>Selecione o shopping para importar (apenas para usuários corporativos)</span>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="action-buttons">
+            {% if next %}
+              <a href="{{ next }}" class="btn btn-modern btn-cancel">
+                <span>↩️</span>
+                <span>Cancelar</span>
+              </a>
+            {% else %}
+              <a href="{% url 'painel_documentos_gerencial' %}" class="btn btn-modern btn-cancel">
+                <span>↩️</span>
+                <span>Cancelar</span>
+              </a>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-modern btn-import" id="btnSubmit" disabled>
+              <span>📊</span>
+              <span>Importar Documentos</span>
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fileInput = document.querySelector('input[type="file"]');
+  const fileWrapper = document.getElementById('fileUploadWrapper');
+  const fileSelected = document.getElementById('fileSelected');
+  const fileName = document.getElementById('fileName');
+  const fileSize = document.getElementById('fileSize');
+  const btnSubmit = document.getElementById('btnSubmit');
+  const form = document.getElementById('importForm');
+
+  // File selection
+  fileInput.addEventListener('change', function(e) {
+    if (this.files && this.files[0]) {
+      const file = this.files[0];
+      displayFileInfo(file);
+      btnSubmit.disabled = false;
+    }
+  });
+
+  // Drag and drop
+  fileWrapper.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+  });
+
+  fileWrapper.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+  });
+
+  fileWrapper.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      fileInput.files = e.dataTransfer.files;
+      const file = e.dataTransfer.files[0];
+      displayFileInfo(file);
+      btnSubmit.disabled = false;
+    }
+  });
+
+  function displayFileInfo(file) {
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileSelected.classList.add('active');
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  // Form submission
+  form.addEventListener('submit', function() {
+    btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span><span>Importando...</span>';
+    btnSubmit.disabled = true;
+  });
+</script>
+
+{% endblock %}

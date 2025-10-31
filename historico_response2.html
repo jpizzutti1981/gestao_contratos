@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestão de Contratos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <link rel="stylesheet" href="/static/css/base.css">
+  <style>
+    html { font-size: 15px; }
+    main.container { max-width: 1140px; }
+    .navbar-brand { font-weight: 600; letter-spacing: 0.5px; }
+    .navbar {
+      min-height: 56px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .nav-link, .navbar-brand { transition: color 0.15s; }
+    .nav-link.active, .nav-link:focus, .nav-link:hover { color: #ffd600 !important; }
+    .navbar-nav .nav-item .nav-link { font-weight: 500; }
+    .btn-logout { border-radius: 6px; font-size: 0.95rem; }
+    .dropdown-menu { min-width: 180px; }
+    .user-greeting { font-size: 0.97rem; font-weight: 500; }
+    @media (max-width: 991px) {
+      .navbar-brand { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-secondary px-3 px-md-4">
+    <div class="container-fluid">
+      <a class="navbar-brand text-light d-flex align-items-center gap-2" href="/painel/">
+        <i class="bi bi-journal-text"></i> GESTÃO | CONTRATOS
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Alternar navegação">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+    </div>
+  </nav>
+
+  <!-- Mensagens -->
+  <main class="container mt-3">
+    
+    
+<div class="container mt-4">
+  <h4 class="mb-4">📁 Histórico do Documento: teste1</h4>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Data Emissão</th>
+        <th>Vencimento</th>
+        <th>Status</th>
+        <th>Anexos</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr>
+        <td>Documento</td>
+        <td>29/09/2025</td>
+        <td>29/10/2025</td>
+        <td>Pendente</td>
+        <td>
+          
+            
+              <div class="mb-1">
+                <a href="/uploads/anexos/Passo_a_Passo_Loja_Vidalle_19NWOxa.pdf" target="_blank" class="link-primary">📄 Passo_a_Passo_Loja_Vidalle_19NWOxa.pdf</a>
+              </div>
+            
+              <div class="mb-1">
+                <a href="/uploads/anexos/_Lojas_do_Pontal_Shopping_lHE7KmA.pdf" target="_blank" class="link-primary">📄 _Lojas_do_Pontal_Shopping_lHE7KmA.pdf</a>
+              </div>
+            
+          
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+  <a href="/painel/shopping/2/" class="btn btn-secondary">🔙 Voltar</a>
+
+  </main>
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Ativa tooltips do Bootstrap se houver
+    if (window.bootstrap) {
+      var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    }
+  </script>
+</body>
+</html>

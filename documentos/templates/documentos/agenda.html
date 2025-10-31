@@ -1,0 +1,520 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- FullCalendar CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
+
+<style>
+  :root {
+    --calendar-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+  }
+
+  .calendar-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  .calendar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .calendar-header {
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+
+  .calendar-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--calendar-gradient);
+  }
+
+  .calendar-title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--calendar-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .calendar-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .calendar-subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+  }
+
+  /* Legend Section */
+  .calendar-legend {
+    background: white;
+    padding: 1.5rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .legend-dot.success { background: var(--success-color); }
+  .legend-dot.warning { background: var(--warning-color); }
+  .legend-dot.danger { background: var(--danger-color); }
+  .legend-dot.info { background: var(--info-color); }
+
+  /* Calendar Body */
+  #calendar {
+    background: white;
+    padding: 2rem;
+    border-radius: 0 0 24px 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  /* FullCalendar Customization */
+  .fc {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  .fc .fc-toolbar {
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 0;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    color: #1e293b;
+    text-transform: capitalize;
+  }
+
+  .fc .fc-button {
+    background: var(--calendar-gradient) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1.2rem !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3) !important;
+  }
+
+  .fc .fc-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+  }
+
+  .fc .fc-button:active {
+    transform: translateY(0) !important;
+  }
+
+  .fc .fc-button-primary:disabled {
+    background: #cbd5e1 !important;
+    box-shadow: none !important;
+    opacity: 0.6;
+  }
+
+  .fc .fc-button-group {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .fc .fc-button-group > .fc-button {
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  .fc .fc-button-group > .fc-button:first-child {
+    border-radius: 12px 0 0 12px !important;
+  }
+
+  .fc .fc-button-group > .fc-button:last-child {
+    border-radius: 0 12px 12px 0 !important;
+  }
+
+  /* Calendar Grid */
+  .fc-theme-standard td,
+  .fc-theme-standard th {
+    border-color: #e2e8f0 !important;
+  }
+
+  .fc .fc-col-header-cell {
+    background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
+    padding: 1rem 0.5rem !important;
+    font-weight: 700 !important;
+    color: #475569;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+
+  .fc .fc-daygrid-day {
+    transition: background 0.2s ease;
+  }
+
+  .fc .fc-daygrid-day:hover {
+    background: #f8fafc;
+  }
+
+  .fc .fc-daygrid-day-number {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    padding: 0.5rem;
+  }
+
+  .fc .fc-day-today {
+    background: linear-gradient(135deg, #667eea15, #764ba215) !important;
+  }
+
+  .fc .fc-day-today .fc-daygrid-day-number {
+    background: var(--calendar-gradient);
+    color: white;
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    font-weight: 700;
+  }
+
+  /* Events */
+  .fc-event {
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.35rem 0.6rem !important;
+    margin: 2px 4px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+  }
+
+  .fc-event:hover {
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+    z-index: 10 !important;
+  }
+
+  .fc-event-title {
+    font-weight: 600 !important;
+  }
+
+  /* Event Colors by Status */
+  .fc-event.status-success {
+    background: var(--success-color) !important;
+  }
+
+  .fc-event.status-warning {
+    background: var(--warning-color) !important;
+  }
+
+  .fc-event.status-danger {
+    background: var(--danger-color) !important;
+  }
+
+  .fc-event.status-info {
+    background: var(--info-color) !important;
+  }
+
+  /* List View */
+  .fc-list-event:hover td {
+    background: #f8fafc !important;
+  }
+
+  .fc-list-event-dot {
+    border-width: 6px !important;
+    border-radius: 50%;
+  }
+
+  .fc-list-day-cushion {
+    background: linear-gradient(to right, #f8fafc, white) !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+  }
+
+  /* More Link */
+  .fc .fc-more-link {
+    background: var(--calendar-gradient);
+    color: white !important;
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .fc .fc-more-link:hover {
+    text-decoration: none;
+    opacity: 0.9;
+  }
+
+  /* Popover */
+  .fc .fc-popover {
+    border-radius: 16px !important;
+    border: none !important;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2) !important;
+  }
+
+  .fc .fc-popover-header {
+    background: var(--calendar-gradient) !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 1rem !important;
+  }
+
+  /* Loading State */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .fc-loading {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .calendar-wrapper {
+      padding: 1rem 0;
+    }
+
+    .calendar-header {
+      padding: 1.5rem 1rem;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .calendar-title {
+      font-size: 1.5rem;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .calendar-icon {
+      font-size: 2rem;
+    }
+
+    .calendar-legend {
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    #calendar {
+      padding: 1rem;
+      border-radius: 0 0 20px 20px;
+    }
+
+    .fc .fc-toolbar {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .fc .fc-toolbar-title {
+      font-size: 1.3rem !important;
+    }
+
+    .fc .fc-button {
+      padding: 0.5rem 1rem !important;
+      font-size: 0.8rem !important;
+    }
+
+    .fc-event {
+      font-size: 0.7rem !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .calendar-title {
+      font-size: 1.3rem;
+    }
+
+    .legend-item {
+      font-size: 0.8rem;
+    }
+
+    .fc .fc-daygrid-day-number {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .calendar-container {
+    animation: fadeInUp 0.6s ease-out;
+  }
+</style>
+
+<div class="calendar-wrapper">
+  <div class="container">
+    <div class="calendar-container">
+      <!-- Header -->
+      <div class="calendar-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h1 class="calendar-title">
+              <span class="calendar-icon">📅</span>
+              <span>Agenda de Vencimentos</span>
+            </h1>
+            <p class="calendar-subtitle">Acompanhe todos os prazos e documentos importantes</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="calendar-legend">
+        <div class="legend-item">
+          <span class="legend-dot success"></span>
+          <span>No Prazo</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot warning"></span>
+          <span>A Vencer</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot danger"></span>
+          <span>Vencido</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot info"></span>
+          <span>Informativo</span>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div id="calendar"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      locale: 'pt-br',
+      initialView: 'dayGridMonth',
+      height: 'auto',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,listMonth'
+      },
+      buttonText: {
+        today: 'Hoje',
+        month: 'Mês',
+        list: 'Lista'
+      },
+      titleFormat: { 
+        year: 'numeric', 
+        month: 'long' 
+      },
+      dayMaxEvents: 3,
+      moreLinkText: function(num) {
+        return '+' + num + ' mais';
+      },
+      eventTimeFormat: {
+        hour: '2-digit',
+        minute: '2-digit',
+        meridiem: false
+      },
+      events: '/api/vencimentos/',
+      eventDidMount: function(info) {
+        // Add status class to events
+        const status = info.event.extendedProps.status;
+        if (status) {
+          info.el.classList.add('status-' + status);
+        }
+      },
+      eventClick: function(info) {
+        info.jsEvent.preventDefault();
+        if (info.event.url) {
+          window.location.href = info.event.url;
+        }
+      },
+      loading: function(isLoading) {
+        if (isLoading) {
+          calendarEl.classList.add('fc-loading');
+        } else {
+          calendarEl.classList.remove('fc-loading');
+        }
+      },
+      eventMouseEnter: function(info) {
+        info.el.style.zIndex = '999';
+      },
+      eventMouseLeave: function(info) {
+        info.el.style.zIndex = '';
+      }
+    });
+
+    calendar.render();
+
+    // Responsive adjustments
+    function handleResize() {
+      if (window.innerWidth < 768) {
+        calendar.setOption('dayMaxEvents', 2);
+      } else {
+        calendar.setOption('dayMaxEvents', 3);
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+  });
+</script>
+
+{% endblock %}

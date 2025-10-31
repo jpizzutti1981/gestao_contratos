@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  web:
+    build: .
+    container_name: django_teste
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app                  # inclui o código-fonte inteiro
+      - ./uploads:/app/uploads  # preserva uploads locais
+      - ./db.sqlite3:/app/db.sqlite3  # mantém o mesmo banco local
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DJANGO_SETTINGS_MODULE=gestao_contratos.settings # ajuste conforme seu projeto
+    restart: unless-stopped
+
+# Observações:
+# - O volume .:/app garante que alterações locais sejam refletidas no container
+# - O banco e os uploads são persistentes (não serão sobrescritos)
+# - O restart: unless-stopped faz o container reiniciar automaticamente
+# - Em produção, troque SQLite por PostgreSQL e adicione Nginx

@@ -1,0 +1,32 @@
+# Ambiente virtual
+venv/
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Arquivos de ambiente
+.env
+**/.env
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Banco de dados local (dev)
+db.sqlite3
+
+# Arquivos gerados/temporários
+.DS_Store
+Thumbs.db
+
+# Uploads do sistema (conteúdo dinâmico)
+uploads/
+!uploads/.gitkeep
+
+# Django collectstatic (se configurado)
+staticfiles/
+
+# Logs
+*.log

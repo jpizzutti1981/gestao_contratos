@@ -1,0 +1,657 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --secondary-gradient: linear-gradient(135deg, #64748b, #475569);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  }
+
+  .upload-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  .upload-container {
+    max-width: 850px;
+    margin: 0 auto;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .upload-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+  }
+
+  .card-header-upload {
+    background: var(--success-gradient);
+    color: white;
+    padding: 2rem;
+    border: none;
+  }
+
+  .header-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  .header-icon {
+    font-size: 2.5rem;
+  }
+
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .header-subtitle {
+    text-align: center;
+    margin-top: 0.5rem;
+    opacity: 0.95;
+    font-size: 0.95rem;
+  }
+
+  .card-body-upload {
+    padding: 2.5rem;
+  }
+
+  /* Form Groups */
+  .form-group-upload {
+    margin-bottom: 2rem;
+  }
+
+  .form-label-upload {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .form-control-upload,
+  .form-select-upload {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+  }
+
+  .form-control-upload:focus,
+  .form-select-upload:focus {
+    border-color: #0ba360;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(11, 163, 96, 0.1);
+    outline: none;
+  }
+
+  textarea.form-control-upload {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  /* Attachments Section */
+  .attachments-section {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-header {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .attachment-item {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .attachment-item input[type="file"] {
+    flex: 1;
+  }
+
+  .btn-remove-attachment {
+    background: var(--danger-gradient);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);
+    min-width: 45px;
+  }
+
+  .btn-remove-attachment:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 16px rgba(250, 112, 154, 0.4);
+  }
+
+  .btn-add-attachment {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-add-attachment:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .file-preview {
+    background: linear-gradient(135deg, #0ba36015, #3cba9215);
+    border-left: 4px solid #0ba360;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: #0ba360;
+  }
+
+  .file-preview-icon {
+    font-size: 1.5rem;
+  }
+
+  .file-hint {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+    margin-top: 2rem;
+  }
+
+  .btn-modern {
+    flex: 1;
+    border: none;
+    border-radius: 14px;
+    padding: 1.1rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-decoration: none;
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-submit {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .btn-submit:hover {
+    box-shadow: 0 8px 24px rgba(11, 163, 96, 0.4);
+    color: white;
+  }
+
+  .btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-cancel {
+    background: var(--secondary-gradient);
+    color: white;
+  }
+
+  .btn-cancel:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: white;
+  }
+
+  /* Loading State */
+  .loading-overlay {
+    display: none;
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  .loading-overlay.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(102, 126, 234, 0.3);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-weight: 700;
+    color: #667eea;
+    margin-left: 1rem;
+    font-size: 1.05rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .upload-wrapper {
+      padding: 1rem 0;
+    }
+
+    .upload-container {
+      padding: 0 1rem;
+    }
+
+    .card-header-upload {
+      padding: 1.5rem;
+    }
+
+    .header-icon-wrapper {
+      width: 70px;
+      height: 70px;
+    }
+
+    .header-icon {
+      font-size: 2rem;
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+    }
+
+    .card-body-upload {
+      padding: 1.5rem;
+    }
+
+    .attachments-section {
+      padding: 1.25rem;
+    }
+
+    .attachment-item {
+      flex-direction: column;
+    }
+
+    .btn-remove-attachment {
+      width: 100%;
+    }
+
+    .action-buttons {
+      flex-direction: column-reverse;
+    }
+  }
+</style>
+
+<div class="upload-wrapper">
+  <div class="upload-container">
+    <div class="upload-card">
+      
+      <!-- Header -->
+      <div class="card-header-upload">
+        <div class="header-icon-wrapper">
+          <div class="header-icon">📤</div>
+        </div>
+        <h1 class="header-title">Novo Documento</h1>
+        <p class="header-subtitle">Preencha os dados e anexe os arquivos necessários</p>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body-upload">
+        <form method="post" enctype="multipart/form-data" id="upload-form">
+          {% csrf_token %}
+            {% if request.GET.next or request.META.HTTP_REFERER %}
+              <input type="hidden" name="next" value="{{ request.GET.next|default:request.META.HTTP_REFERER }}">
+            {% endif %}
+
+          <!-- Document Type -->
+          <div class="form-group-upload">
+            <label for="{{ form.tipo.id_for_label }}" class="form-label-upload">
+              <span>📁</span>
+              <span>Tipo</span>
+            </label>
+            {{ form.tipo|add_class:"form-control-upload form-select-upload" }}
+          </div>
+
+          <!-- Title -->
+          <div class="form-group-upload">
+            <label for="{{ form.titulo.id_for_label }}" class="form-label-upload">
+              <span>📝</span>
+              <span>Título</span>
+            </label>
+            {{ form.titulo|add_class:"form-control-upload" }}
+          </div>
+
+          <!-- Description -->
+          <div class="form-group-upload">
+            <label for="{{ form.descricao.id_for_label }}" class="form-label-upload">
+              <span>📄</span>
+              <span>Descrição</span>
+            </label>
+            {{ form.descricao|add_class:"form-control-upload" }}
+          </div>
+
+          <!-- Dates Row -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group-upload">
+                <label for="{{ form.data_emissao.id_for_label }}" class="form-label-upload">
+                  <span>📤</span>
+                  <span>Data de Emissão</span>
+                </label>
+                {{ form.data_emissao|add_class:"form-control-upload" }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group-upload">
+                <label for="{{ form.data_vencimento.id_for_label }}" class="form-label-upload">
+                  <span>⏰</span>
+                  <span>Vencimento</span>
+                </label>
+                {{ form.data_vencimento|add_class:"form-control-upload" }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Attachments Section -->
+          <div class="attachments-section">
+            <div class="section-header">
+              <span>📎</span>
+              <span>Anexos</span>
+            </div>
+
+            <div id="anexos-container">
+              <div class="attachment-item">
+                <input type="file" 
+                       name="anexos" 
+                       class="form-control form-control-upload" 
+                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
+                       multiple 
+                       required>
+              </div>
+            </div>
+
+            <button type="button" id="add-anexo" class="btn-add-attachment">
+              <span>➕</span>
+              <span>Adicionar Outro Anexo</span>
+            </button>
+
+            <div id="preview-pdf" class="file-hint">
+              <span>💡</span>
+              <span>Formatos aceitos: PDF, DOC, DOCX, JPG, PNG</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            {% if request.GET.next or request.META.HTTP_REFERER %}
+              <a href="{{ request.GET.next|default:request.META.HTTP_REFERER }}" class="btn-modern btn-cancel">
+                <span>↩️</span>
+                <span>Cancelar</span>
+              </a>
+            {% else %}
+              <a href="{% url 'painel_redirect' %}" class="btn-modern btn-cancel">
+                <span>↩️</span>
+                <span>Cancelar</span>
+              </a>
+            {% endif %}
+            <button type="submit" class="btn-modern btn-submit" id="submit-btn">
+              <span>📤</span>
+              <span>Enviar</span>
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="loading" class="loading-overlay">
+            <div style="display: flex; align-items: center; justify-content: center;">
+              <div class="spinner"></div>
+              <span class="loading-text">Enviando documento...</span>
+            </div>
+            <div style="margin-top: 0.75rem; color: #64748b; font-size: 0.9rem;">
+              Por favor, aguarde. Não feche esta página.
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div style="background: white; border-radius: 16px; padding: 1.5rem; margin-top: 1.5rem; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+      <div style="font-weight: 700; color: #1e293b; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <span>💡</span>
+        <span>Dicas para Upload</span>
+      </div>
+      <ul style="color: #64748b; font-size: 0.9rem; line-height: 1.8; margin: 0; padding-left: 1.5rem;">
+        <li>Certifique-se de que todos os arquivos estão completos e legíveis</li>
+        <li>Você pode adicionar múltiplos anexos clicando em "Adicionar Outro Anexo"</li>
+        <li>Verifique as datas de emissão e vencimento antes de enviar</li>
+        <li>Uma descrição clara ajuda na organização dos documentos</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById("upload-form");
+  const loading = document.getElementById("loading");
+  const submitBtn = document.getElementById("submit-btn");
+  const addAnexoBtn = document.getElementById("add-anexo");
+  const anexosContainer = document.getElementById("anexos-container");
+  const preview = document.getElementById("preview-pdf");
+
+  let fileCount = 0;
+
+  // Add new attachment field
+  addAnexoBtn.addEventListener("click", function() {
+    const newAnexo = document.createElement("div");
+    newAnexo.className = "attachment-item";
+    newAnexo.innerHTML = `
+      <input type="file" 
+             name="anexos" 
+             class="form-control form-control-upload" 
+             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+      <button type="button" class="btn-remove-attachment remove-anexo">
+        ❌
+      </button>
+    `;
+    anexosContainer.appendChild(newAnexo);
+    
+    // Add remove event
+    newAnexo.querySelector('.remove-anexo').addEventListener('click', function() {
+      newAnexo.style.animation = 'slideOutLeft 0.3s ease-out';
+      setTimeout(() => {
+        newAnexo.remove();
+        updatePreview();
+      }, 300);
+    });
+
+    // Update preview on change
+    newAnexo.querySelector('input[type="file"]').addEventListener('change', updatePreview);
+  });
+
+  // Keyframe for slide out animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideOutLeft {
+      to {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Update preview
+  function updatePreview() {
+    const fileInputs = document.querySelectorAll('input[name="anexos"]');
+    let totalFiles = 0;
+    let totalSize = 0;
+
+    fileInputs.forEach(input => {
+      if (input.files.length > 0) {
+        for (let file of input.files) {
+          totalFiles++;
+          totalSize += file.size;
+        }
+      }
+    });
+    
+    if (totalFiles > 0) {
+      const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+      preview.innerHTML = `
+        <div class="file-preview">
+          <span class="file-preview-icon">📎</span>
+          <span><strong>${totalFiles} arquivo(s) selecionado(s)</strong> (${sizeInMB} MB)</span>
+        </div>
+      `;
+    } else {
+      preview.innerHTML = `
+        <span>💡</span>
+        <span>Formatos aceitos: PDF, DOC, DOCX, JPG, PNG</span>
+      `;
+    }
+  }
+
+  // Listen to file changes
+  document.addEventListener('change', function(e) {
+    if (e.target.name === 'anexos') {
+      updatePreview();
+    }
+  });
+
+  // Form submission
+  form.addEventListener("submit", function(e) {
+    // Validate at least one file
+    const fileInputs = document.querySelectorAll('input[name="anexos"]');
+    let hasFile = false;
+    
+    fileInputs.forEach(input => {
+      if (input.files.length > 0) {
+        hasFile = true;
+      }
+    });
+
+    if (!hasFile) {
+      e.preventDefault();
+      alert('Por favor, adicione pelo menos um anexo.');
+      return false;
+    }
+
+    // Show loading state
+    loading.classList.add('active');
+    submitBtn.disabled = true;
+    
+    // Scroll to loading
+    loading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // Prevent accidental navigation
+  let formModified = false;
+  form.addEventListener('input', function() {
+    formModified = true;
+  });
+
+  window.addEventListener('beforeunload', function(e) {
+    if (formModified && !submitBtn.disabled) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+</script>
+
+{% endblock %}

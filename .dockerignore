@@ -1,0 +1,20 @@
+# Excluir dados e artefatos do contexto de build
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Dados persistentes (montados por volume no compose)
+uploads/
+db.sqlite3
+
+# VCS
+.git/
+.gitignore
+
+# Editor/IDE
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,630 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --info-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  }
+
+  .pending-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  /* Header */
+  .page-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--primary-gradient);
+  }
+
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .kpi-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    animation: fadeInUp 0.5s ease-out backwards;
+  }
+
+  .kpi-card:nth-child(1) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.2s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.3s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: height 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  }
+
+  .kpi-card:hover::before {
+    height: 100%;
+    opacity: 0.05;
+  }
+
+  .kpi-card.total::before { background: var(--primary-gradient); }
+  .kpi-card.success::before { background: var(--success-gradient); }
+  .kpi-card.warning::before { background: var(--warning-gradient); }
+  .kpi-card.danger::before { background: var(--danger-gradient); }
+
+  .kpi-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .kpi-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .kpi-card.total .kpi-value { color: #667eea; }
+  .kpi-card.success .kpi-value { color: #0ba360; }
+  .kpi-card.warning .kpi-value { color: #f5576c; }
+  .kpi-card.danger .kpi-value { color: #fa709a; }
+
+  /* Action Bar */
+  .action-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-view-all {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+
+  .btn-view-all:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Table Container */
+  .table-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  .table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table-modern thead {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  }
+
+  .table-modern thead th {
+    padding: 1.25rem 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    color: #475569;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .table-modern thead th:first-child {
+    border-radius: 12px 0 0 0;
+  }
+
+  .table-modern thead th:last-child {
+    border-radius: 0 12px 0 0;
+  }
+
+  .table-modern tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .table-modern tbody tr:hover {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    transform: scale(1.01);
+  }
+
+  .table-modern tbody td {
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+    font-size: 0.95rem;
+    color: #334155;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+  }
+
+  .badge-aprovado {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .badge-reprovado {
+    background: var(--danger-gradient);
+    color: white;
+  }
+
+  .badge-pendente {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-action {
+    border: none;
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    min-width: 45px;
+    justify-content: center;
+  }
+
+  .btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  }
+
+  .btn-pdf {
+    background: var(--primary-gradient);
+    color: white;
+  }
+
+  .btn-pdf:hover {
+    color: white;
+  }
+
+  .btn-detail {
+    background: var(--info-gradient);
+    color: white;
+  }
+
+  .btn-detail:hover {
+    color: white;
+  }
+
+  .btn-approve {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .btn-approve:hover {
+    color: white;
+  }
+
+  .btn-reject {
+    background: white;
+    color: #fa709a;
+    border: 2px solid #fa709a;
+  }
+
+  .btn-reject:hover {
+    background: var(--danger-gradient);
+    color: white;
+    border-color: transparent;
+  }
+
+  .btn-action:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .pagination-modern {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .page-item-modern {
+    margin: 0;
+  }
+
+  .page-link-modern {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    height: 45px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    color: #64748b;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .page-link-modern:hover {
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+  }
+
+  .page-item-modern.active .page-link-modern {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .page-item-modern.disabled .page-link-modern {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .pending-wrapper {
+      padding: 1rem 0;
+    }
+
+    .page-header {
+      padding: 1.5rem;
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+    }
+
+    .kpi-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .kpi-card {
+      padding: 1.25rem;
+    }
+
+    .kpi-value {
+      font-size: 2rem;
+    }
+
+    .table-container {
+      padding: 1rem;
+      overflow-x: auto;
+    }
+
+    .table-modern {
+      min-width: 900px;
+    }
+
+    .action-bar {
+      margin-bottom: 1rem;
+    }
+
+    .btn-view-all {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .kpi-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="pending-wrapper">
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="header-title">
+        <span>📋</span>
+        <span>Pendências para Aprovação</span>
+      </h1>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card total">
+        <div class="kpi-icon">📊</div>
+        <div class="kpi-label">Total</div>
+        <div class="kpi-value">{{ indicadores.total }}</div>
+      </div>
+
+      <div class="kpi-card success">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">No Prazo</div>
+        <div class="kpi-value">{{ indicadores.no_prazo }}</div>
+      </div>
+
+      <div class="kpi-card warning">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-label">A Vencer (60d)</div>
+        <div class="kpi-value">{{ indicadores.a_vencer }}</div>
+      </div>
+
+      <div class="kpi-card danger">
+        <div class="kpi-icon">❌</div>
+        <div class="kpi-label">Vencidos</div>
+        <div class="kpi-value">{{ indicadores.vencidos }}</div>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <a href="{% url 'detalhes_shopping' request.user.perfil.shopping.id %}" class="btn-view-all">
+        <span>📄</span>
+        <span>Ver Todos os Documentos</span>
+      </a>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+      <div class="table-responsive">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Tipo</th>
+              <th>Vencimento</th>
+              <th>Enviado por</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in page_obj %}
+            <tr>
+              <td><strong>{{ doc.titulo }}</strong></td>
+              <td>{{ doc.get_tipo_display }}</td>
+              <td>{{ doc.data_vencimento|date:"d/m/Y" }}</td>
+              <td>{{ doc.enviado_por.get_full_name|default:doc.enviado_por.username }}</td>
+              <td>
+                {% if doc.status_aprovacao == 'reprovado' %}
+                  <span class="status-badge badge-reprovado">❌ Reprovado</span>
+                {% elif doc.status_aprovacao == 'aprovado' %}
+                  <span class="status-badge badge-aprovado">✅ Aprovado</span>
+                {% else %}
+                  <span class="status-badge badge-pendente">⏳ Pendente</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="action-buttons">
+                  {% with primeiro_anexo=doc.anexos.all|first %}
+                    {% if primeiro_anexo %}
+                      <a href="{{ primeiro_anexo.arquivo.url }}" 
+                         target="_blank" 
+                         class="btn-action btn-pdf" 
+                         title="Ver PDF">
+                        📄
+                      </a>
+                    {% else %}
+                      <button class="btn-action btn-pdf" disabled title="Sem anexos">
+                        📄
+                      </button>
+                    {% endif %}
+                  {% endwith %}
+
+                  <a href="{% url 'detalhar_documento' tipo=doc.tipo doc_id=doc.id %}" 
+                     class="btn-action btn-detail" 
+                     title="Detalhar">
+                    🔍
+                  </a>
+                  
+                  {% if is_gestor and doc.status_aprovacao != 'aprovado' %}
+                    <form action="{% url 'aprovar_documento' doc.id %}" 
+                          method="post" 
+                          style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" 
+                              class="btn-action btn-approve" 
+                              title="Aprovar">
+                        ✅
+                      </button>
+                    </form>
+
+                    <a href="{% url 'reprovar_documento' doc.id %}" 
+                       class="btn-action btn-reject" 
+                       title="Reprovar">
+                      ❌
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="empty-icon">🎉</div>
+                  <div class="empty-text">Nenhuma pendência encontrada!</div>
+                  <p style="margin-top: 1rem; color: #94a3b8;">
+                    Todos os documentos foram processados
+                  </p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-wrapper">
+      <ul class="pagination-modern">
+        {% if page_obj.has_previous %}
+          <li class="page-item-modern">
+            <a class="page-link-modern" href="?page={{ page_obj.previous_page_number }}">‹</a>
+          </li>
+        {% else %}
+          <li class="page-item-modern disabled">
+            <span class="page-link-modern">‹</span>
+          </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <li class="page-item-modern active">
+              <span class="page-link-modern">{{ num }}</span>
+            </li>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item-modern">
+              <a class="page-link-modern" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <li class="page-item-modern">
+            <a class="page-link-modern" href="?page={{ page_obj.next_page_number }}">›</a>
+          </li>
+        {% else %}
+          <li class="page-item-modern disabled">
+            <span class="page-link-modern">›</span>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% endblock %}

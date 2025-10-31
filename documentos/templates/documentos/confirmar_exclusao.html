@@ -1,0 +1,407 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão - {{ doc.titulo|default:"Documento" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ========================================
+     PAGE LAYOUT & BACKGROUND
+     ======================================== */
+  .delete-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  /* Animated Background Pattern */
+  .delete-page-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    animation: backgroundShift 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes backgroundShift {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+  }
+  
+  /* Floating Particles Effect */
+  .delete-page-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.3), transparent),
+      radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.3), transparent),
+      radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.3), transparent),
+      radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.3), transparent),
+      radial-gradient(2px 2px at 90% 60%, rgba(255, 255, 255, 0.3), transparent),
+      radial-gradient(1px 1px at 30% 80%, rgba(255, 255, 255, 0.3), transparent);
+    background-size: 200% 200%;
+    animation: particlesFloat 30s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  @keyframes particlesFloat {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+  }
+  
+  /* Container Positioning */
+  .delete-page-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+  
+  /* ========================================
+     BACK BUTTON
+     ======================================== */
+  .back-button-wrapper {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: #4b5563;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+  
+  .btn-back:hover {
+    background: rgba(255, 255, 255, 1);
+    color: #111827;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn-back:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .btn-back svg {
+    transition: transform 0.2s ease;
+  }
+  
+  .btn-back:hover svg {
+    transform: translateX(-3px);
+  }
+  
+  /* ========================================
+     GLASS CARD WRAPPER
+     ======================================== */
+  .delete-glass-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 24px;
+    box-shadow: 
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+    overflow: hidden;
+    animation: cardEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  @keyframes cardEntrance {
+    from {
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  /* ========================================
+     BREADCRUMB
+     ======================================== */
+  .delete-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.25rem 2rem;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .breadcrumb-link {
+    color: #6b7280;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .breadcrumb-link:hover {
+    color: #111827;
+  }
+  
+  .breadcrumb-separator {
+    color: #d1d5db;
+  }
+  
+  .breadcrumb-current {
+    color: #111827;
+    font-weight: 500;
+  }
+  
+  /* ========================================
+     RESPONSIVE ADJUSTMENTS
+     ======================================== */
+  @media (max-width: 767.98px) {
+    .delete-page-wrapper {
+      padding: 1.5rem 0.75rem;
+    }
+    
+    .back-button-wrapper {
+      margin-bottom: 1rem;
+      padding: 0 0.5rem;
+    }
+    
+    .delete-breadcrumb {
+      padding: 1rem 1.25rem;
+      font-size: 0.8125rem;
+    }
+    
+    .btn-back {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+  }
+  
+  @media (max-width: 575.98px) {
+    .delete-breadcrumb {
+      flex-wrap: wrap;
+    }
+  }
+  
+  /* ========================================
+     ACCESSIBILITY & PRINT
+     ======================================== */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  
+  @media print {
+    .delete-page-wrapper {
+      background: white;
+      min-height: auto;
+    }
+    
+    .delete-page-wrapper::before,
+    .delete-page-wrapper::after {
+      display: none;
+    }
+    
+    .back-button-wrapper,
+    .delete-breadcrumb {
+      display: none;
+    }
+    
+    .delete-glass-card {
+      box-shadow: none;
+      border: 1px solid #e5e7eb;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-page-wrapper">
+  <div class="delete-page-container">
+    
+    <!-- Botão Voltar -->
+    <div class="back-button-wrapper">
+      <a href="{{ cancel_url|default:request.META.HTTP_REFERER|default:'/' }}" 
+         class="btn-back"
+         aria-label="Voltar para a página anterior">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        <span>Voltar</span>
+      </a>
+    </div>
+    
+    <!-- Card Principal -->
+    <div class="delete-glass-card">
+      
+      <!-- Breadcrumb -->
+      <nav class="delete-breadcrumb" aria-label="Navegação estrutural">
+        <div class="breadcrumb-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <a href="/" class="breadcrumb-link">Início</a>
+        </div>
+        
+        <span class="breadcrumb-separator">›</span>
+        
+        <div class="breadcrumb-item">
+          <a href="{% url 'listar_documentos' %}" class="breadcrumb-link">Documentos</a>
+        </div>
+        
+        <span class="breadcrumb-separator">›</span>
+        
+        <div class="breadcrumb-item">
+          <span class="breadcrumb-current">Confirmar Exclusão</span>
+        </div>
+      </nav>
+      
+      <!-- Include do Card de Confirmação -->
+      {% include 'documentos/includes/confirm_delete_card.html' with doc=doc action_url=request.path cancel_url=cancel_url|default:request.META.HTTP_REFERER objeto_nome="documento" %}
+      
+    </div>
+    
+  </div>
+</div>
+
+<script>
+  (function() {
+    'use strict';
+    
+    // ========================================
+    // ESC Key Handler
+    // ========================================
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        
+        // Priorizar botão cancelar do include
+        const cancelBtn = document.querySelector('.btn-cancel, .btn-action.btn-cancel');
+        
+        if (cancelBtn) {
+          // Se for um link, navegar
+          if (cancelBtn.href) {
+            window.location.href = cancelBtn.href;
+          }
+          // Se for um botão, clicar
+          else {
+            cancelBtn.click();
+          }
+        }
+        // Fallback para botão voltar
+        else {
+          const backBtn = document.querySelector('.btn-back');
+          if (backBtn && backBtn.href) {
+            window.location.href = backBtn.href;
+          }
+        }
+      }
+    });
+    
+    // ========================================
+    // Page Visibility Handler
+    // ========================================
+    let pageHiddenAt = null;
+    
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        pageHiddenAt = Date.now();
+      } else if (pageHiddenAt) {
+        // Se a página ficou oculta por mais de 5 minutos, recarregar
+        const hiddenDuration = Date.now() - pageHiddenAt;
+        if (hiddenDuration > 5 * 60 * 1000) {
+          console.log('Página oculta por muito tempo, recarregando...');
+          window.location.reload();
+        }
+        pageHiddenAt = null;
+      }
+    });
+    
+    // ========================================
+    // Prevent Navigation During Submission
+    // ========================================
+    let isSubmitting = false;
+    const form = document.getElementById('deleteConfirmationForm');
+    
+    if (form) {
+      form.addEventListener('submit', function() {
+        isSubmitting = true;
+      });
+      
+      // Avisar sobre navegação durante submit
+      window.addEventListener('beforeunload', function(e) {
+        if (isSubmitting) {
+          e.preventDefault();
+          e.returnValue = 'A exclusão está em andamento. Tem certeza que deseja sair?';
+          return e.returnValue;
+        }
+      });
+    }
+    
+    // ========================================
+    // Analytics/Logging (opcional)
+    // ========================================
+    const pageLoadTime = Date.now();
+    
+    window.addEventListener('unload', function() {
+      const timeOnPage = Date.now() - pageLoadTime;
+      
+      // Se o usuário passou menos de 2 segundos na página, pode ter sido acidental
+      if (timeOnPage < 2000 && !isSubmitting) {
+        console.log('Usuário saiu rapidamente da página de confirmação');
+      }
+    });
+    
+    // ========================================
+    // Acessibilidade: Focus Management
+    // ========================================
+    window.addEventListener('load', function() {
+      // Focar no primeiro elemento interativo
+      const firstInteractive = document.querySelector('.btn-back, .btn-cancel, .btn-delete-confirm');
+      
+      if (firstInteractive && !document.activeElement || document.activeElement === document.body) {
+        // Pequeno delay para garantir que a animação de entrada terminou
+        setTimeout(function() {
+          firstInteractive.focus();
+        }, 600);
+      }
+    });
+    
+  })();
+</script>
+{% endblock %}

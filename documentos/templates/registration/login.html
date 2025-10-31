@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #004d40;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .login-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    min-height: 80vh;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  }
+
+  /* Lado esquerdo com texto institucional */
+  .login-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #00695c, #004d40);
+    color: #fff;
+    padding: 3rem;
+    text-align: left;
+  }
+
+  .login-left h2 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+  }
+
+  .login-left p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    opacity: 0.95;
+  }
+
+  /* Lado direito com login */
+  .login-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: #f9f9f9;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 380px;
+  }
+
+  .login-logo {
+    max-width: 130px;
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    font-weight: 700;
+    color: #004d40;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .form-control {
+    font-size: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .form-control:focus {
+    border-color: #00bfa5;
+    box-shadow: 0 0 0 3px rgba(0,191,165,0.25);
+  }
+
+  .btn-primary {
+    background: linear-gradient(90deg, #00bfa5, #00695c);
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.9rem;
+    width: 100%;
+    transition: 0.2s;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 191, 165, 0.6);
+  }
+
+  .footer-text {
+    font-size: 0.8rem;
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #555;
+  }
+
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .login-wrapper {
+      flex-direction: column;
+    }
+    .login-left {
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+  }
+</style>
+
+<div class="login-wrapper">
+  <!-- Lado esquerdo com texto institucional -->
+  <div class="login-left">
+    <div>
+      <h2>O Grupo AD</h2>
+      <p>
+        A AD Shopping está presente em todas as regiões brasileiras. Seu portfólio é composto 
+        por 43 empreendimentos de diversos formatos, localizados tanto em capitais quanto no interior. 
+        São 34 anos de experiência em planejamento, comercialização e gestão de shopping centers.
+      </p>
+      <p>
+        O Grupo AD lançou a <strong>AlugueON</strong>, sua plataforma de marketplace para Shoppings, 
+        que facilita a prospecção dos locatários na obtenção do ponto comercial em sua estratégia 
+        de expansão comercial; seja em lojas, quiosques ou mídia.
+      </p>
+    </div>
+  </div>
+
+  <!-- Lado direito com login -->
+  <div class="login-right">
+    <div class="login-container text-center">
+      <img src="{% static 'img/logoad2.png' %}" alt="Logo" class="login-logo">
+      <h4>🔐 Acesso ao Sistema</h4>
+
+      {% if form.errors or form.non_field_errors or form.username.errors or form.password.errors %}
+        <div class="alert alert-danger text-start">
+          <strong>Erro:</strong> Usuário ou senha inválidos.<br>
+          <span class="small">Verifique seus dados e tente novamente.</span>
+        </div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3 input-group">
+          <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+          <input type="text" name="username" class="form-control" placeholder="Usuário" required autofocus>
+        </div>
+        <div class="mb-3 input-group">
+          <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+          <input type="password" name="password" class="form-control" placeholder="Senha" required>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Entrar</button>
+      </form>
+
+      <div class="footer-text">
+        <p>Sistema de Gestão de Contratos e Documentos</p>
+        <p>© {{ now|date:'Y' }} Grupo AD</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

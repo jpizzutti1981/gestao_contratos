@@ -1,0 +1,624 @@
+{% extends 'base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --info-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  }
+
+  .details-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  .details-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .details-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--primary-gradient);
+  }
+
+  .details-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .main-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    border: none;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .card-section {
+    padding: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .card-section:last-child {
+    border-bottom: none;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .info-item {
+    position: relative;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+  }
+
+  .info-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .info-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .info-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    word-break: break-word;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+  }
+
+  .status-badge:hover {
+    transform: scale(1.05);
+  }
+
+  .status-vencido {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+  }
+
+  .status-a-vencer {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+  }
+
+  .status-em-dia {
+    background: linear-gradient(135deg, #0ba360, #3cba92);
+    color: white;
+  }
+
+  .status-aprovado {
+    background: linear-gradient(135deg, #0ba360, #3cba92);
+    color: white;
+  }
+
+  .status-reprovado {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+  }
+
+  .status-pendente {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  /* Rejection Reason Alert */
+  .rejection-alert {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-left: 4px solid #f59e0b;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .rejection-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .rejection-content {
+    flex: 1;
+  }
+
+  .rejection-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  .rejection-text {
+    color: #92400e;
+    line-height: 1.6;
+  }
+
+  /* Attachments Section */
+  .attachments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .attachment-card {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .attachment-card:hover {
+    background: white;
+    border-color: #667eea;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    color: inherit;
+  }
+
+  .attachment-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .attachment-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    word-break: break-word;
+    color: #1e293b;
+  }
+
+  /* Action Buttons */
+  .action-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 2rem;
+    background: linear-gradient(to top, #f8fafc, white);
+  }
+
+  .btn-modern {
+    border: none;
+    border-radius: 14px;
+    padding: 0.85rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-primary-modern {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  .btn-primary-modern:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: white;
+  }
+
+  .btn-outline-modern {
+    background: white;
+    color: #667eea;
+    border: 2px solid #667eea;
+  }
+
+  .btn-outline-modern:hover {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+  }
+
+  .btn-warning-modern {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+  }
+
+  .btn-warning-modern:hover {
+    background: linear-gradient(135deg, #f5576c, #e63946);
+    color: white;
+  }
+
+  .btn-danger-modern {
+    background: linear-gradient(135deg, #fa709a, #fee140);
+    color: white;
+  }
+
+  .btn-danger-modern:hover {
+    background: linear-gradient(135deg, #fee140, #fa709a);
+    color: white;
+  }
+
+  .btn-info-modern {
+    background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+    color: white;
+  }
+
+  .btn-info-modern:hover {
+    background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+    color: white;
+  }
+
+  .admin-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #00d2ff15, #3a7bd515);
+    border-radius: 20px;
+    color: #0284c7;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 2px solid #00d2ff;
+  }
+
+  /* Modal Styling */
+  .modal-content {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .modal-header {
+    background: var(--danger-gradient);
+    color: white;
+    border-radius: 24px 24px 0 0;
+    padding: 1.5rem;
+    border: none;
+  }
+
+  .modal-title {
+    font-weight: 800;
+    font-size: 1.3rem;
+  }
+
+  .modal-body {
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.6;
+  }
+
+  .modal-footer {
+    border: none;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 0 0 24px 24px;
+  }
+
+  .btn-close {
+    filter: brightness(0) invert(1);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .details-wrapper {
+      padding: 1rem 0;
+    }
+
+    .details-header {
+      padding: 1.5rem;
+      border-radius: 16px;
+    }
+
+    .details-title {
+      font-size: 1.4rem;
+    }
+
+    .card-section {
+      padding: 1.5rem;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .attachments-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .action-bar {
+      flex-direction: column;
+    }
+
+    .btn-modern {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="details-wrapper">
+  <div class="container">
+    <!-- Header -->
+    <div class="details-header">
+      <h1 class="details-title">
+        <span>🔍</span>
+        <span>Detalhes do {{ tipo_objeto|title }}</span>
+      </h1>
+    </div>
+
+    <!-- Main Card -->
+    <div class="main-card">
+      
+      <!-- Basic Information Section -->
+      <div class="card-section">
+        <h2 class="section-title">📋 Informações Básicas</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">📝 Título</div>
+            <div class="info-value">{{ doc.titulo }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">📁 Tipo</div>
+            <div class="info-value">{{ doc.get_tipo_display }}</div>
+          </div>
+
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <div class="info-label">📄 Descrição</div>
+            <div class="info-value">{{ doc.descricao|default:"Sem descrição fornecida" }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates Section -->
+      <div class="card-section">
+        <h2 class="section-title">📅 Datas</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">📤 Data de Emissão</div>
+            <div class="info-value">{{ doc.data_emissao|date:"d/m/Y" }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">⏰ Data de Vencimento</div>
+            <div class="info-value">{{ doc.data_vencimento|date:"d/m/Y" }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">🚀 Status de Vencimento</div>
+            <div class="info-value">
+              {% if doc.data_vencimento < hoje %}
+                <span class="status-badge status-vencido">❌ Vencido</span>
+              {% elif doc.data_vencimento <= hoje_plus_60 %}
+                <span class="status-badge status-a-vencer">⚠️ A Vencer</span>
+              {% else %}
+                <span class="status-badge status-em-dia">✅ Em Dia</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">✓ Situação</div>
+            <div class="info-value">
+              {% if doc.status_aprovacao == 'aprovado' %}
+                <span class="status-badge status-aprovado">✅ Aprovado</span>
+              {% elif doc.status_aprovacao == 'reprovado' %}
+                <span class="status-badge status-reprovado">❌ Reprovado</span>
+              {% else %}
+                <span class="status-badge status-pendente">⏳ Pendente</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if doc.status_aprovacao == 'reprovado' and doc.motivo_reprovacao %}
+          <div class="rejection-alert">
+            <div class="rejection-icon">⚠️</div>
+            <div class="rejection-content">
+              <div class="rejection-title">Motivo da Reprovação</div>
+              <div class="rejection-text">{{ doc.motivo_reprovacao }}</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- User Information Section -->
+      <div class="card-section">
+        <h2 class="section-title">👤 Informações do Usuário</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-label">📤 Enviado por</div>
+            <div class="info-value">{{ doc.enviado_por.get_full_name|default:doc.enviado_por.username }}</div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-label">🕐 Data de Envio</div>
+            <div class="info-value">{{ doc.data_envio|date:"d/m/Y H:i" }}</div>
+          </div>
+
+          {% if doc.aprovado_por %}
+            <div class="info-item">
+              <div class="info-label">✅ Aprovado por</div>
+              <div class="info-value">{{ doc.aprovado_por.get_full_name|default:doc.aprovado_por.username }}</div>
+            </div>
+
+            <div class="info-item">
+              <div class="info-label">🕐 Data de Aprovação</div>
+              <div class="info-value">{{ doc.data_aprovacao|date:"d/m/Y H:i" }}</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Attachments Section -->
+      {% if doc.anexos.all %}
+        <div class="card-section">
+          <h2 class="section-title">
+            📎 Anexos
+            <span style="font-size: 1rem; font-weight: 600; color: #667eea;">({{ doc.anexos.count }})</span>
+          </h2>
+          <div class="attachments-grid">
+            {% for anexo in doc.anexos.all %}
+              <a href="{{ anexo.arquivo.url }}" target="_blank" class="attachment-card">
+                <div class="attachment-icon">📄</div>
+                <div class="attachment-name">{{ anexo.arquivo.name|basename }}</div>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="action-bar">
+        {# Voltar com URL segura calculada no backend, evitando loops #}
+        <a href="{{ back_url }}" class="btn-modern btn-primary-modern">
+          <span>🔙</span>
+          <span>Voltar</span>
+        </a>
+
+          {# Histórico: passar next para que a página de histórico saiba voltar #}
+          <a href="{% url 'ver_historico_documento' doc.titulo doc.shopping.id %}?next={{ request.get_full_path|urlencode }}" class="btn-modern btn-outline-modern">
+            <span>📁</span>
+            <span>Histórico</span>
+          </a>
+
+          {% if pode_editar %}
+            <a href="{% url 'editar_documento' tipo=tipo_objeto doc_id=doc.id %}?next={{ request.get_full_path|urlencode }}" class="btn-modern btn-warning-modern">
+              <span>✏️</span>
+              <span>Editar</span>
+            </a>
+          {% endif %}
+
+          {% if pode_excluir %}
+            <button type="button" class="btn-modern btn-danger-modern" data-bs-toggle="modal" data-bs-target="#confirmarExclusaoModal">
+              <span>🗑️</span>
+              <span>Excluir</span>
+            </button>
+          {% endif %}
+          
+          {% if doc.status_aprovacao == 'aprovado' and request.user.is_superuser %}
+            <div class="admin-badge">
+              <span>🛡️</span>
+              <span>Modo Admin Ativo</span>
+            </div>
+          {% endif %}
+
+        {% if doc.status_aprovacao == 'reprovado' %}
+          <a href="{% url 'reenviar_documento' doc.id %}?next={{ request.get_full_path|urlencode }}" class="btn-modern btn-info-modern">
+            <span>📤</span>
+            <span>Reenviar</span>
+          </a>
+        {% endif %}
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmarExclusaoModal" tabindex="-1" aria-labelledby="confirmarExclusaoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">🗑️ Confirmar Exclusão</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <strong>Atenção!</strong> Tem certeza que deseja excluir este documento? Esta ação é <strong>irreversível</strong> e não poderá ser desfeita.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form method="post" action="{% url 'excluir_documento' tipo=tipo_objeto doc_id=doc.id %}" style="display: inline;" class="delete-form">
+          {% csrf_token %}
+          <button type="submit" class="btn-modern btn-delete" aria-label="Confirmar exclusão do documento {{ doc.titulo }}">
+            <span class="btn-icon">🗑️</span>
+            <span>Confirmar</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,578 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  :root {
+    --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --secondary-gradient: linear-gradient(135deg, #64748b, #475569);
+    --warning-bg: linear-gradient(135deg, #fef3c7, #fde68a);
+  }
+
+  .reject-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 1rem;
+  }
+
+  .reject-container {
+    max-width: 750px;
+    width: 100%;
+    animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .reject-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    border: none;
+    overflow: hidden;
+  }
+
+  .card-header-reject {
+    background: var(--danger-gradient);
+    color: white;
+    padding: 2rem;
+    border: none;
+    position: relative;
+  }
+
+  .header-icon-wrapper {
+    background: rgba(255,255,255,0.2);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+    }
+  }
+
+  .header-icon {
+    font-size: 2.5rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .header-subtitle {
+    text-align: center;
+    margin-top: 0.5rem;
+    opacity: 0.95;
+    font-size: 0.95rem;
+  }
+
+  .card-body-reject {
+    padding: 2.5rem;
+  }
+
+  /* Document Info Section */
+  .doc-info-section {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #fa709a;
+  }
+
+  .section-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+  }
+
+  .info-row:hover {
+    transform: translateX(4px);
+  }
+
+  .info-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .info-label {
+    font-weight: 700;
+    color: #64748b;
+    min-width: 130px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .info-value {
+    flex: 1;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+
+  /* Form Section */
+  .form-section {
+    margin-bottom: 2rem;
+  }
+
+  .form-label-modern {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .form-control-modern {
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+    min-height: 160px;
+    resize: vertical;
+    font-family: inherit;
+  }
+
+  .form-control-modern:focus {
+    border-color: #fa709a;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(250, 112, 154, 0.1);
+    outline: none;
+  }
+
+  .form-control-modern::placeholder {
+    color: #94a3b8;
+    font-style: italic;
+  }
+
+  .char-counter {
+    text-align: right;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+    font-weight: 600;
+  }
+
+  /* Warning Box */
+  .warning-box {
+    background: var(--warning-bg);
+    border-left: 4px solid #f59e0b;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .warning-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .warning-content {
+    flex: 1;
+  }
+
+  .warning-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+  }
+
+  .warning-text {
+    color: #92400e;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+  }
+
+  .btn-modern {
+    flex: 1;
+    border: none;
+    border-radius: 14px;
+    padding: 1.1rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+  }
+
+  .btn-modern:hover::before {
+    width: 400px;
+    height: 400px;
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+
+  .btn-reject {
+    background: var(--danger-gradient);
+    color: white;
+  }
+
+  .btn-reject:hover {
+    box-shadow: 0 8px 24px rgba(250, 112, 154, 0.4);
+    color: white;
+  }
+
+  .btn-cancel {
+    background: var(--secondary-gradient);
+    color: white;
+  }
+
+  .btn-cancel:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: white;
+  }
+
+  /* Loading State */
+  .btn-modern:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-loading {
+    position: relative;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .reject-wrapper {
+      padding: 1rem;
+    }
+
+    .card-header-reject {
+      padding: 1.5rem;
+    }
+
+    .header-icon-wrapper {
+      width: 70px;
+      height: 70px;
+    }
+
+    .header-icon {
+      font-size: 2rem;
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+    }
+
+    .card-body-reject {
+      padding: 1.5rem;
+    }
+
+    .doc-info-section {
+      padding: 1.25rem;
+    }
+
+    .info-row {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .info-label {
+      min-width: auto;
+    }
+
+    .action-buttons {
+      flex-direction: column-reverse;
+    }
+
+    .btn-modern {
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .header-title {
+      font-size: 1.3rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="reject-wrapper">
+  <div class="reject-container">
+    <div class="reject-card">
+      
+      <!-- Header -->
+      <div class="card-header-reject">
+        <div class="header-icon-wrapper">
+          <div class="header-icon">❌</div>
+        </div>
+        <h1 class="header-title">Reprovar Documento</h1>
+        <p class="header-subtitle">Esta ação notificará o responsável sobre a reprovação</p>
+      </div>
+
+      <!-- Body -->
+      <div class="card-body-reject">
+        
+        <!-- Document Information -->
+        <div class="doc-info-section">
+          <div class="section-title">
+            <span>📋</span>
+            <span>Informações do Documento</span>
+          </div>
+          
+          <div class="info-row">
+            <div class="info-label">
+              <span>📝</span>
+              <span>Título:</span>
+            </div>
+            <div class="info-value">{{ doc.titulo }}</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">
+              <span>📁</span>
+              <span>Tipo:</span>
+            </div>
+            <div class="info-value">{{ doc.get_tipo_display }}</div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-label">
+              <span>⏰</span>
+              <span>Vencimento:</span>
+            </div>
+            <div class="info-value">{{ doc.data_vencimento|date:"d/m/Y" }}</div>
+          </div>
+        </div>
+
+        <!-- Warning Box -->
+        <div class="warning-box">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-content">
+            <div class="warning-title">Atenção</div>
+            <div class="warning-text">
+              Ao reprovar este documento, o responsável será notificado e deverá corrigir as pendências antes de reenviar para aprovação. Certifique-se de descrever claramente os motivos da reprovação.
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form method="post" id="rejectForm">
+          {% csrf_token %}
+          
+          <div class="form-section">
+            <label for="motivo" class="form-label-modern">
+              <span>✍️</span>
+              <span>Justificativa da Reprovação</span>
+            </label>
+            <textarea 
+              name="motivo" 
+              id="motivo" 
+              class="form-control-modern" 
+              required 
+              placeholder="Descreva de forma clara e objetiva os motivos da reprovação..."
+              maxlength="1000"></textarea>
+            <div class="char-counter">
+              <span id="charCount">0</span> / 1000 caracteres
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <a href="{% url 'pendencias_gestor' %}" class="btn-modern btn-cancel">
+              <span>↩️</span>
+              <span>Cancelar</span>
+            </a>
+            <button type="submit" class="btn-modern btn-reject" id="btnSubmit">
+              <span>❌</span>
+              <span>Confirmar Reprovação</span>
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="text-center mt-4">
+      <small style="color: #64748b; font-weight: 500;">
+        💡 Dica: Seja específico sobre os problemas encontrados para facilitar a correção
+      </small>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Character counter
+  const textarea = document.getElementById('motivo');
+  const charCount = document.getElementById('charCount');
+
+  textarea.addEventListener('input', function() {
+    const count = this.value.length;
+    charCount.textContent = count;
+    
+    if (count > 900) {
+      charCount.style.color = '#f59e0b';
+    } else {
+      charCount.style.color = '#64748b';
+    }
+  });
+
+  // Form submission handling
+  const form = document.getElementById('rejectForm');
+  const btnSubmit = document.getElementById('btnSubmit');
+  let isSubmitting = false;
+
+  form.addEventListener('submit', function(e) {
+    if (isSubmitting) {
+      e.preventDefault();
+      return false;
+    }
+
+    // Validate textarea
+    if (textarea.value.trim().length < 10) {
+      e.preventDefault();
+      alert('Por favor, forneça uma justificativa mais detalhada (mínimo 10 caracteres).');
+      textarea.focus();
+      return false;
+    }
+
+    isSubmitting = true;
+    btnSubmit.disabled = true;
+    btnSubmit.classList.add('btn-loading');
+    
+    const originalContent = btnSubmit.innerHTML;
+    btnSubmit.innerHTML = '<span>⏳</span><span>Processando...</span>';
+    
+    // If for some reason it takes too long, re-enable after 5 seconds
+    setTimeout(() => {
+      if (isSubmitting) {
+        btnSubmit.disabled = false;
+        btnSubmit.classList.remove('btn-loading');
+        btnSubmit.innerHTML = originalContent;
+        isSubmitting = false;
+      }
+    }, 5000);
+  });
+
+  // ESC key to focus cancel button
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const cancelBtn = document.querySelector('.btn-cancel');
+      if (cancelBtn && !isSubmitting) {
+        window.location.href = cancelBtn.href;
+      }
+    }
+  });
+
+  // Auto-focus textarea
+  window.addEventListener('load', function() {
+    textarea.focus();
+  });
+
+  // Confirmation before leaving if text is entered
+  let textEntered = false;
+  textarea.addEventListener('input', function() {
+    textEntered = this.value.trim().length > 0;
+  });
+
+  window.addEventListener('beforeunload', function(e) {
+    if (textEntered && !isSubmitting) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
+</script>
+
+{% endblock %}

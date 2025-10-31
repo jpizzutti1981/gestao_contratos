@@ -1,0 +1,526 @@
+{% extends 'base.html' %}
+{% load form_extras %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #0ba360 0%, #3cba92 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+  }
+
+  .history-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+  }
+
+  /* Header Section */
+  .history-header {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .history-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--primary-gradient);
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .header-title-section {
+    flex: 1;
+  }
+
+  .header-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    word-break: break-word;
+  }
+
+  .document-count {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    color: #667eea;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  /* Timeline Section */
+  .timeline-container {
+    background: white;
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #667eea, #764ba2, #667eea);
+    border-radius: 2px;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 16px;
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+    animation: slideInRight 0.4s ease-out backwards;
+  }
+
+  .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+  .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+  .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+  .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+  .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .timeline-item:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+    background: white;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.65rem;
+    top: 2rem;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border: 4px solid #667eea;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px white;
+  }
+
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .timeline-type {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .timeline-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .status-aprovado {
+    background: var(--success-gradient);
+    color: white;
+  }
+
+  .status-reprovado {
+    background: var(--warning-gradient);
+    color: white;
+  }
+
+  .status-pendente {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+  }
+
+  .timeline-dates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .date-item {
+    background: white;
+    padding: 0.85rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .date-icon {
+    font-size: 1.2rem;
+  }
+
+  .date-content {
+    flex: 1;
+  }
+
+  .date-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .date-value {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.95rem;
+  }
+
+  /* Attachments Section */
+  .attachments-section {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 2px dashed #cbd5e1;
+  }
+
+  .attachments-title {
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+  }
+
+  .attachment-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border-radius: 10px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin: 0.25rem;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+  }
+
+  .attachment-link:hover {
+    background: var(--primary-gradient);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  .no-attachments {
+    color: #94a3b8;
+    font-style: italic;
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  /* Back Button */
+  .back-button-wrapper {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .btn-back {
+    background: linear-gradient(135deg, #64748b, #475569);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+    text-decoration: none;
+  }
+
+  .btn-back:hover {
+    background: linear-gradient(135deg, #475569, #334155);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(100, 116, 139, 0.4);
+    color: white;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  .empty-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #64748b;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .history-wrapper {
+      padding: 1rem 0;
+    }
+
+    .history-header {
+      padding: 1.5rem;
+    }
+
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+    }
+
+    .timeline-container {
+      padding: 1.5rem;
+    }
+
+    .timeline {
+      padding-left: 1.5rem;
+    }
+
+    .timeline-item {
+      padding: 1.25rem;
+    }
+
+    .timeline-item::before {
+      left: -2.15rem;
+    }
+
+    .timeline-dates {
+      grid-template-columns: 1fr;
+    }
+
+    .timeline-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .attachment-link {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .header-title {
+      font-size: 1.2rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .document-count {
+      font-size: 0.85rem;
+    }
+  }
+</style>
+
+<div class="history-wrapper">
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="history-header">
+      <div class="header-content">
+        <div class="header-title-section">
+          <div class="header-label">Histórico do Documento</div>
+          <h1 class="header-title">
+            <span>📁</span>
+            <span>{{ titulo }}</span>
+          </h1>
+          <div class="document-count">
+            <span>📊</span>
+            <span>{{ documentos|length }} versão{% if documentos|length != 1 %}ões{% else %}ão{% endif %} registrada{% if documentos|length != 1 %}s{% endif %}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-container">
+      {% if documentos %}
+        <div class="timeline">
+          {% for doc in documentos %}
+            <div class="timeline-item">
+              <div class="timeline-header">
+                <div class="timeline-type">
+                  <span>📄</span>
+                  <span>{{ doc.get_tipo_display }}</span>
+                </div>
+                <div class="timeline-status status-{{ doc.status_aprovacao }}">
+                  {% if doc.status_aprovacao == 'aprovado' %}
+                    <span>✅</span>
+                    <span>Aprovado</span>
+                  {% elif doc.status_aprovacao == 'reprovado' %}
+                    <span>❌</span>
+                    <span>Reprovado</span>
+                  {% else %}
+                    <span>⏳</span>
+                    <span>Pendente</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="timeline-dates">
+                <div class="date-item">
+                  <div class="date-icon">📤</div>
+                  <div class="date-content">
+                    <div class="date-label">Data de Emissão</div>
+                    <div class="date-value">{{ doc.data_emissao|date:"d/m/Y" }}</div>
+                  </div>
+                </div>
+
+                <div class="date-item">
+                  <div class="date-icon">⏰</div>
+                  <div class="date-content">
+                    <div class="date-label">Vencimento</div>
+                    <div class="date-value">{{ doc.data_vencimento|date:"d/m/Y" }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="attachments-section">
+                <div class="attachments-title">📎 Anexos</div>
+                {% if doc.anexos.all %}
+                  <div>
+                    {% for anexo in doc.anexos.all %}
+                      <a href="{{ anexo.arquivo.url }}" 
+                         target="_blank" 
+                         class="attachment-link">
+                        <span>📄</span>
+                        <span>{{ anexo.arquivo.name|basename }}</span>
+                      </a>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="no-attachments">Nenhum anexo disponível</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">Nenhum histórico encontrado para este documento</div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-button-wrapper">
+      {% with next_param=request.GET.next|default:request.META.HTTP_REFERER %}
+        {% if next_param %}
+          <a href="{{ next_param }}" class="btn-back">
+            <span>🔙</span>
+            <span>Voltar</span>
+          </a>
+        {% else %}
+          <a href="{% url 'detalhes_shopping' shopping_id %}" class="btn-back">
+            <span>🔙</span>
+            <span>Voltar</span>
+          </a>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

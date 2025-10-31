@@ -1,0 +1,52 @@
+{% extends 'base_admin.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 800px;">
+  <h3 class="mb-4 text-primary">👤 Editar Usuário</h3>
+
+  <form method="post" class="shadow-sm p-4 bg-white rounded" style="max-width: 600px;">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label for="id_username" class="form-label">Usuário</label>
+        {{ form.username|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+        <label for="id_first_name" class="form-label">Nome</label>
+        {{ form.first_name|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+        <label for="id_last_name" class="form-label">Sobrenome</label>
+        {{ form.last_name|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+        <label for="id_email" class="form-label">E-mail</label>
+        {{ form.email|add_class:"form-control" }}
+    </div>
+
+    <div class="mb-3">
+        <label for="id_grupo" class="form-label">Grupo</label>
+        {{ form.grupo|add_class:"form-select" }}
+    </div>
+
+    <div class="mb-3">
+        <label for="id_shopping" class="form-label">Shopping</label>
+        {{ form.shopping|add_class:"form-select" }}
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+        <button type="submit" class="btn btn-success">
+            💾 Salvar Alterações
+        </button>
+        <a href="{% url 'listar_usuarios' %}" class="btn btn-secondary">
+            ❌ Cancelar
+        </a>
+    </div>
+</form>
+
+</div>
+{% endblock %}

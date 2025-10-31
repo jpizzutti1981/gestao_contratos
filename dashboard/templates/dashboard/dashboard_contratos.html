@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="mb-0">📊 Dashboard de {{ tipo|title }}</h1>
+    <form method="get" class="d-flex gap-2">
+      <select name="tipo" class="form-select form-select-sm" style="max-width: 160px;">
+        <option value="documento" {% if tipo == 'documento' %}selected{% endif %}>Documentos</option>
+        <option value="contrato" {% if tipo == 'contrato' %}selected{% endif %}>Contratos</option>
+      </select>
+      <select name="status" class="form-select form-select-sm" style="max-width: 180px;">
+        <option value="">Todos os status de aprovação</option>
+        <option value="pendente" {% if filtro_status == 'pendente' %}selected{% endif %}>Pendente</option>
+        <option value="aprovado" {% if filtro_status == 'aprovado' %}selected{% endif %}>Aprovado</option>
+      </select>
+      <select name="janela" class="form-select form-select-sm" style="max-width: 140px;">
+        <option value="30" {% if janela == 30 %}selected{% endif %}>Janela 30d</option>
+        <option value="60" {% if janela == 60 %}selected{% endif %}>Janela 60d</option>
+        <option value="90" {% if janela == 90 %}selected{% endif %}>Janela 90d</option>
+      </select>
+      {% if shopping_list %}
+      <select name="shopping" class="form-select form-select-sm" style="max-width: 220px;">
+        <option value="">Todos os shoppings</option>
+        {% for sh in shopping_list %}
+          <option value="{{ sh.id }}" {% if filtro_shopping and filtro_shopping|add:'0' == sh.id|add:'0' %}selected{% endif %}>{{ sh.nome }}</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      <button type="submit" class="btn btn-outline-primary btn-sm">Filtrar</button>
+      <a href="{% url 'dashboard_contratos' %}" class="btn btn-outline-secondary btn-sm">Limpar</a>
+    </form>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card p-3 text-center shadow-sm">
+        <div class="fw-bold">Total</div>
+        <div class="fs-4">{{ indicadores.total }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card p-3 text-center shadow-sm border-success">
+        <div class="fw-bold text-success">No Prazo</div>
+        <div class="fs-4">{{ indicadores.no_prazo }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card p-3 text-center shadow-sm border-warning">
+        <div class="fw-bold text-warning">A Vencer ({{ janela }}d)</div>
+        <div class="fs-4">{{ indicadores.a_vencer }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card p-3 text-center shadow-sm border-danger">
+        <div class="fw-bold text-danger">Vencidos</div>
+        <div class="fs-4">{{ indicadores.vencidos }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card p-3 text-center shadow-sm">
+        <div class="fw-bold">Pendentes</div>
+        <div class="fs-4">{{ indicadores.pendentes_aprovacao }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+      <div class="card p-3 text-center shadow-sm">
+        <div class="fw-bold">Aprovados</div>
+        <div class="fs-4">{{ indicadores.aprovados }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="row g-3 mb-4">
+    <div class="col-12 col-xl-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Distribuição por Status</h5>
+          <canvas id="statusChart" height="120"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-xl-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ tipo|title }} por Shopping</h5>
+          <canvas id="shoppingChart" height="120"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid por Shopping -->
+  <div class="row g-3 mb-4">
+    {% for s in por_shopping_list %}
+      <div class="col-12 col-md-6 col-xl-4">
+        <div class="card p-3 shadow-sm">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="mb-0">{{ s.shopping__nome }}</h5>
+            <span class="badge bg-primary">Total: {{ s.total }}</span>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <span class="badge bg-success">No Prazo: {{ s.no_prazo }}</span>
+            <span class="badge bg-warning text-dark">A Vencer: {{ s.a_vencer }}</span>
+            <span class="badge bg-danger">Vencidos: {{ s.vencidos }}</span>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-secondary">Sem registros para exibir.</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Tabela: A Vencer -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">{{ tipo|title }} a Vencer ({{ janela }} dias)</h5>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Shopping</th>
+              <th>Título</th>
+              <th>Emissão</th>
+              <th>Vencimento</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in a_vencer_list %}
+              <tr>
+                <td>{{ doc.shopping.nome }}</td>
+                <td><strong>{{ doc.titulo }}</strong></td>
+                <td>{{ doc.data_emissao|date:'d/m/Y' }}</td>
+                <td>{{ doc.data_vencimento|date:'d/m/Y' }}</td>
+                <td>
+                  {% if doc.status_aprovacao == 'aprovado' %}
+                    <span class="badge bg-success">Aprovado</span>
+                  {% elif doc.status_aprovacao == 'pendente' %}
+                    <span class="badge bg-warning text-dark">Pendente</span>
+                  {% else %}
+                    <span class="badge bg-secondary">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'detalhar_documento' tipo=doc.tipo doc_id=doc.id %}">Ver</a>
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-center text-muted">Nenhum {{ tipo }} a vencer na janela selecionada.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const statusData = {{ status_counts|safe }};
+  const labels = statusData.map(s => s.status_aprovacao || '—');
+  const values = statusData.map(s => s.total);
+  const statusCtx = document.getElementById('statusChart');
+  new Chart(statusCtx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: '{{ tipo|title }}',
+        data: values,
+        backgroundColor: ['#22c55e','#f59e0b','#ef4444','#64748b'],
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  const shoppingData = {{ por_shopping_json|safe }};
+  const shopLabels = shoppingData.map(s => s["shopping__nome"]);
+  const shopTotals = shoppingData.map(s => s["total"]);
+  const shoppingCtx = document.getElementById('shoppingChart');
+  new Chart(shoppingCtx, {
+    type: 'bar',
+    data: {
+      labels: shopLabels,
+      datasets: [{
+        label: 'Total por Shopping',
+        data: shopTotals,
+        backgroundColor: '#3b82f6'
+      }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+</script>
+<div class="row mt-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Top 5 shoppings por vencidos</h5>
+        <canvas id="chartTop5Vencidos" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Top 5 shoppings por a vencer</h5>
+        <canvas id="chartTop5Avencer" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">SLA de aprovação (média)</h5>
+        {% if indicadores.sla_aprovacao_dias %}
+          <div class="display-6">{{ indicadores.sla_aprovacao_dias }} dias</div>
+          <div class="text-muted">Tempo médio entre envio e aprovação</div>
+        {% else %}
+          <div class="text-muted">Sem dados de aprovação para o filtro atual</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Top 5 Vencidos
+  const top5Vencidos = JSON.parse('{{ top5_vencidos_json|escapejs }}');
+  const ctxV = document.getElementById('chartTop5Vencidos');
+  if (ctxV && top5Vencidos && top5Vencidos.length) {
+    new Chart(ctxV, {
+      type: 'bar',
+      data: {
+        labels: top5Vencidos.map(r => r.shopping__nome),
+        datasets: [{
+          label: 'Vencidos',
+          data: top5Vencidos.map(r => r.vencidos),
+          backgroundColor: 'rgba(220, 53, 69, 0.6)',
+          borderColor: 'rgba(220, 53, 69, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, precision: 0 } }
+      }
+    });
+  }
+
+  // Top 5 A Vencer
+  const top5Avencer = JSON.parse('{{ top5_avencer_json|escapejs }}');
+  const ctxA = document.getElementById('chartTop5Avencer');
+  if (ctxA && top5Avencer && top5Avencer.length) {
+    new Chart(ctxA, {
+      type: 'bar',
+      data: {
+        labels: top5Avencer.map(r => r.shopping__nome),
+        datasets: [{
+          label: 'A vencer',
+          data: top5Avencer.map(r => r.a_vencer),
+          backgroundColor: 'rgba(255, 193, 7, 0.6)',
+          borderColor: 'rgba(255, 193, 7, 1)',
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, precision: 0 } }
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

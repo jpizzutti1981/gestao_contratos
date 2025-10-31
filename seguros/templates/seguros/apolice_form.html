@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .form-wrapper { max-width: 900px; margin: 0 auto; padding: 2rem 0; }
+  .form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: none; overflow: hidden; }
+  .form-card-header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1.25rem 1.5rem; }
+  .form-title { font-size: 1.4rem; font-weight: 800; margin: 0; }
+  .form-card-body { padding: 1.5rem; }
+</style>
+
+<div class="form-wrapper">
+  <div class="card form-card">
+    <div class="form-card-header">
+      <h1 class="form-title">➕ Nova Apólice</h1>
+    </div>
+    <div class="form-card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row g-3">
+          {{ form.as_p }}
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <a href="{% url 'seguros_apolice_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
