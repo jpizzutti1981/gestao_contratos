@@ -179,9 +179,8 @@ STATICFILES_DIRS = [ BASE_DIR / "static" ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Arquivos de mídia (uploads de documentos)
-# Observação: os campos FileField usam caminhos como 'uploads/...'.
-# Para evitar duplicação de diretórios (uploads/uploads) após migração,
-# definimos MEDIA_ROOT como BASE_DIR para que os arquivos permaneçam em
-# BASE_DIR/uploads/...
+# Observação: muitos campos FileField usam caminhos relativos iniciando com 'uploads/...'.
+# Para evitar a duplicação de diretórios (uploads/uploads), defina MEDIA_ROOT como BASE_DIR,
+# assim o caminho absoluto será BASE_DIR / 'uploads' / <arquivo>.
 MEDIA_URL = '/uploads/'
-MEDIA_ROOT = BASE_DIR / "uploads"
+MEDIA_ROOT = BASE_DIR
