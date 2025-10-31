@@ -35,7 +35,13 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'dev-insecure-change-me')
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 # Hosts permitidos via .env (separados por vírgula)
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+#ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+ALLOWED_HOSTS = [
+    '3.214.40.70',
+    'localhost',
+    '127.0.0.1',
+]
+
 
 # CSRF trusted origins (opcional)
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if o.strip()]
