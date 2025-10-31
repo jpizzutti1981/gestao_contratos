@@ -1,0 +1,16 @@
+[Unit]
+Description=Gunicorn service for gestao_contratos (Django)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/srv/gestao_contratos
+EnvironmentFile=/etc/gestao_contratos/.env
+ExecStart=/srv/gestao_contratos/venv/bin/gunicorn gestao_contratos.wsgi:application --bind 127.0.0.1:8001 --workers 3 --access-logfile /var/log/gestao_contratos/gunicorn.access.log --error-logfile /var/log/gestao_contratos/gunicorn.error.log
+Restart=always
+RestartSec=5
+TimeoutStartSec=30
+
+[Install]
+WantedBy=multi-user.target
